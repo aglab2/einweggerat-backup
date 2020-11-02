@@ -1,0 +1,262 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+MENU_MAINFRAME MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open ROM/ISO....",           ID_FILE_OPENROM
+        MENUITEM SEPARATOR
+        MENUITEM "&Load Savestate",             ID_LOADSAVESTATE
+        MENUITEM "&Save Savestate",             ID_SAVESTATE
+    END
+    POPUP "&Options"
+    BEGIN
+        POPUP "Input device"
+        BEGIN
+            MENUITEM "Joypad",                      ID_INPUTDEVICE_JOYPAD
+            MENUITEM "Mouse",                       ID_INPUTDEVICE_MOUSE
+            MENUITEM "Analog joypad",               ID_INPUTDEVICE_ANALOGJOYPAD
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Core settings",               ID_OPTIONS_CORESETTINGS
+    END
+    MENUITEM "&About",                      ID_ABOUT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUT DIALOGEX 0, 0, 273, 201
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "About einweggerät"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,108,180,50,14,WS_GROUP
+    LTEXT           "MuGBX",IDC_APPVER,72,6,141,9
+    LTEXT           "Static",IDC_BUILDDATE,72,18,141,9
+    LTEXT           "Visit my site for info and support",IDC_LINK,84,168,120,9
+    EDITTEXT        IDC_CREDITS,12,30,252,126,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 266
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 194
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_INPUT DIALOGEX 0, 0, 296, 175
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_BORDER
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "input is here",IDC_STATIC,60,30,90,12
+    GROUPBOX        "Assigned controls",IDC_STATIC,0,0,292,117
+    CONTROL         "",IDC_LIST_ASSIGN,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER,6,12,282,96
+    EDITTEXT        IDC_EDIT_EVENT,6,132,276,12,ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN
+    GROUPBOX        "Key or joystick event",IDC_STATIC,0,120,292,30
+END
+
+IDD_VARIABLES DIALOGEX 0, 0, 298, 148
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Options",IDC_STATIC,7,0,287,144
+    CONTROL         "",IDC_LIST_VARIABLES,"SysListView32",LVS_LIST | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER,12,12,276,126
+END
+
+IDD_OPTIONS DIALOGEX 0, 0, 339, 224
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CAPTION | WS_SYSMENU
+CAPTION "Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_FOCUSNEVER,6,6,324,192
+    PUSHBUTTON      "OK",ID_SAVE,228,204,50,14
+    PUSHBUTTON      "Cancel",ID_CANCEL,282,204,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_INPUT, DIALOG
+    BEGIN
+        RIGHTMARGIN, 292
+        BOTTOMMARGIN, 123
+    END
+
+    IDD_VARIABLES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 291
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 141
+    END
+
+    IDD_OPTIONS, DIALOG
+    BEGIN
+        RIGHTMARGIN, 333
+        BOTTOMMARGIN, 221
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_INPUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_VARIABLES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_OPTIONS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "emu_wtl.ico"
+
+IDI_ICON2               ICON                    "gamepad.ico"
+
+IDI_ICON3               ICON                    "options.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR1 ACCELERATORS
+BEGIN
+    VK_F1,          ID_LOADSTATEFILE,       VIRTKEY, NOINVERT
+    VK_F3,          ID_RESET,               VIRTKEY, NOINVERT
+    VK_F2,          ID_SAVESTATEFILE,       VIRTKEY, NOINVERT
+END
+
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
