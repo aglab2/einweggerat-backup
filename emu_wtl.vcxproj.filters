@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="CLibretro.cpp" />
+    <ClCompile Include="CLibretro_impl.cpp" />
+    <ClCompile Include="gui\emu_wtl.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="io\audio.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="io\bind_list.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="io\blargg_stuff.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="io\dinput.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="io\gl.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\glad.c">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="io\guid_container.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="io\input.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="3rdparty\cmdline.h" />
+    <ClInclude Include="3rdparty\ini.h" />
+    <ClInclude Include="3rdparty\khrplatform.h" />
+    <ClInclude Include="3rdparty\libretro.h" />
+    <ClInclude Include="3rdparty\resampler.h" />
+    <ClInclude Include="3rdparty\rthreads.h" />
+    <ClInclude Include="CLibretro.h" />
+    <ClInclude Include="gui\emu_wtl.h" />
+    <ClInclude Include="gui\MyWindow.h" />
+    <ClInclude Include="gui\Options.h" />
+    <ClInclude Include="gui\Resource.h" />
+    <ClInclude Include="io\Data_Reader.h" />
+    <ClInclude Include="mudlib.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="io\audio.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="io\bind_list.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="io\blargg_stuff.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="io\dinput.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="io\gl_render.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="io\guid_container.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="io\input.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\mini_al.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gui\emu_wtl.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="emu_wtl.ico" />
+    <Image Include="gamepad.ico" />
+    <Image Include="gui\bitmap1.bmp" />
+    <Image Include="gui\gamepad.ico" />
+    <Image Include="gui\options.ico" />
+    <Image Include="options.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="gui\emu_wtl.ico" />
+    <None Include="gui\icon.ico" />
+    <None Include="gui\small.ico" />
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="IO">
+      <UniqueIdentifier>{911f4eea-16df-47ca-b263-c3750ff572b1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
