@@ -4,7 +4,7 @@
 #include "resource.h"
 #include "MyWindow.h"
 #include "../mudlib.h"
-#include "cmdline.h"
+#include "../../3rdparty-deps/cmdline.h"
 
 using namespace std;
 CAppModule _Module;

@@ -1,10 +1,10 @@
 #include "CLibretro.h"
 #include "io/gl_render.h"
-#include "libretro.h"
+#include "../../3rdparty-deps/libretro.h"
 #include "mudlib.h"
 #include "stdafx.h"
 #define INI_STRNICMP(s1, s2, cnt) (strcmp(s1, s2))
-#include "ini.h"
+#include "../../3rdparty-deps/ini.h"
 
 #define INLINE
 using namespace std;

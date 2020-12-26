@@ -1,7 +1,7 @@
 #ifndef _gl_render_h_
 #define _gl_render_h_
 #include <d3d9.h>
-#include "glad.h"
+#include "../../3rdparty-deps/glad.h"
 void video_deinit();
 bool video_set_pixel_format(unsigned format);
 void video_refresh(const void *data, unsigned width, unsigned height, unsigned pitch);

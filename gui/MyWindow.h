@@ -3,12 +3,12 @@
 #include "../CLibretro.h"
 #include "../mudlib.h"
 #include "../stdafx.h"
-#include "DlgTabCtrl.h"
-#include "DropFileTarget.h"
-#include "PropertyGrid.h"
-#include "cmdline.h"
-#include "ini.h"
-#include "libretro.h"
+#include "../../3rdparty-deps/wtl/DlgTabCtrl.h"
+#include "../../3rdparty-deps/wtl/DropFileTarget.h"
+#include "../../3rdparty-deps/wtl/PropertyGrid.h"
+#include "../../3rdparty-deps/cmdline.h"
+#include "../../3rdparty-deps/ini.h"
+#include "../../3rdparty-deps/libretro.h"
 
 using namespace std;
 

@@ -6,7 +6,7 @@
 #define MUDLIB_IMPLEMENTATION
 #include "mudlib.h"
 #include <mutex>
-#include "libretro.h"
+#include "../../3rdparty-deps/libretro.h"
 namespace std
 {
 	typedef wstring        tstring;

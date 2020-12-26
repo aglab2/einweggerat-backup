@@ -1,6 +1,6 @@
-#include "../3rdparty/libretro.h"
+#include "../../3rdparty-deps/libretro.h"
 #include "gl_render.h"
-#include "glad.h"
+#include "../../3rdparty-deps/glad.h"
 #include <math.h>
 #include <windows.h>
 #include <stdbool.h>

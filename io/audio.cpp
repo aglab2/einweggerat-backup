@@ -4,9 +4,9 @@
 #define RESAMPLER_IMPLEMENTATION
 #include "../mudlib.h"
 #include "audio.h"
-#include "mini_al.h"
-#include "resampler.h"
-#include "rthreads.h"
+#include "../../3rdparty-deps/mini_al.h"
+#include "../../3rdparty-deps/resampler.h"
+#include "../../3rdparty-deps/rthreads.h"
 using namespace std;
 
 #define FRAME_COUNT (1024)

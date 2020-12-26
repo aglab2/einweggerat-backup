@@ -1,5 +1,5 @@
 #include "CLibretro.h"
-#include "libretro.h"
+#include "../../3rdparty-deps/libretro.h"
 #include "stdafx.h"
 
 #define MUDLIB_IMPLEMENTATION
@@ -7,7 +7,7 @@
 #include "mudlib.h"
 #define INI_IMPLEMENTATION
 #define INI_STRNICMP(s1, s2, cnt) (strcmp(s1, s2))
-#include "ini.h"
+#include "../../3rdparty-deps/ini.h"
 
 #define INLINE
 using namespace std;

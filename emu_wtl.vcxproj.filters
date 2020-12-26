@@ -20,29 +20,22 @@
     <ClCompile Include="io\gl.cpp">
       <Filter>IO</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\glad.c">
-      <Filter>IO</Filter>
-    </ClCompile>
     <ClCompile Include="io\guid_container.cpp">
       <Filter>IO</Filter>
     </ClCompile>
     <ClCompile Include="io\input.cpp">
       <Filter>IO</Filter>
     </ClCompile>
+    <ClCompile Include="..\3rdparty-deps\glad.c">
+      <Filter>3rdparty</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3rdparty\cmdline.h" />
-    <ClInclude Include="3rdparty\ini.h" />
-    <ClInclude Include="3rdparty\khrplatform.h" />
-    <ClInclude Include="3rdparty\libretro.h" />
-    <ClInclude Include="3rdparty\resampler.h" />
-    <ClInclude Include="3rdparty\rthreads.h" />
     <ClInclude Include="CLibretro.h" />
     <ClInclude Include="gui\emu_wtl.h" />
     <ClInclude Include="gui\MyWindow.h" />
     <ClInclude Include="gui\Options.h" />
     <ClInclude Include="gui\Resource.h" />
-    <ClInclude Include="io\Data_Reader.h" />
     <ClInclude Include="mudlib.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -91,6 +84,9 @@
   <ItemGroup>
     <Filter Include="IO">
       <UniqueIdentifier>{911f4eea-16df-47ca-b263-c3750ff572b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdparty">
+      <UniqueIdentifier>{8de26673-0eef-4e24-96b7-c62625e9f08d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
