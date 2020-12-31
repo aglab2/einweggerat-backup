@@ -133,7 +133,7 @@ bool audio_init(double refreshra, float input_srate, float fps) {
   audio_ctx_s.client_rate = audio_ctx_s.device.sampleRate;
   audio_ctx_s.resample = resampler_sinc_init();
   // allow for tons of space in the tank
-  size_t outsamples_max = (FRAME_COUNT * 2) * 2 * 16 * 3.0;
+  size_t outsamples_max = (FRAME_COUNT * 2 * sizeof(float));
   size_t sampsize =
       (mal_device_get_buffer_size_in_bytes(&audio_ctx_s.device) * 4);
   audio_ctx_s._fifo = fifo_new(sampsize); // number of bytes

@@ -149,17 +149,16 @@ void refresh_vertex_data() {
 	typedef struct {
 		float x;
 		float y;
-		float z;
 		float s;
 		float t;
 	} vertex_data;
 
 	vertex_data vert[] = {
 		// pos, coord
-		-1.0f, -1.0f, 0., 0.0f,  bottom, // left-bottom
-		-1.0f, 1.0f,  0., 0.0f,  0.0f,   // left-top
-		1.0f,  -1.0f, 0., right, bottom, // right-bottom
-		1.0f,  1.0f,  0., right, 0.0f,   // right-top
+		-1.0f, -1.0f,  0.0f,  bottom, // left-bottom
+		-1.0f, 1.0f,  0.0f,  0.0f,   // left-top
+		1.0f,  -1.0f, right, bottom, // right-bottom
+		1.0f,  1.0f, right, 0.0f,   // right-top
 	};
 
 	glBindVertexArray(g_shader.vao);
@@ -167,7 +166,7 @@ void refresh_vertex_data() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data) * 4, vert, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(g_shader.i_pos);
 	glEnableVertexAttribArray(g_shader.i_coord);
-	glVertexAttribPointer(g_shader.i_pos, 3, GL_FLOAT, GL_FALSE,
+	glVertexAttribPointer(g_shader.i_pos, 2, GL_FLOAT, GL_FALSE,
 		sizeof(vertex_data), (void*)offsetof(vertex_data, x));
 	glVertexAttribPointer(g_shader.i_coord, 2, GL_FLOAT, GL_FALSE,
 		sizeof(vertex_data), (void*)offsetof(vertex_data, s));
@@ -202,13 +201,6 @@ void init_framebuffer(int width, int height) {
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-
-void video_viewport_get_scaled_integer()
-{
-
-
 }
 
 void resize_cb() {

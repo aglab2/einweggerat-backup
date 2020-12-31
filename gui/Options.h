@@ -463,7 +463,7 @@ public:
 		  "true","false",
 		  "on","off"
 		 };
-		char *array1[] = { "enabled", "disabled", "True","False", "On","Off" };
+		char *enabled_arr[] = { "enabled", "disabled", "True","False", "On","Off" };
          vValue.ChangeType(VT_BOOL);
 		 bool changed = false;
          for (int i = 0; i < retro->variables.size(); i++)
@@ -474,22 +474,17 @@ public:
             {
 				for (int j = 0; j < 5; j++)
 				{
-					if (stricmp(retro->variables[i].var.c_str(), array1[j]) == 0)
+					if (stricmp(retro->variables[i].var.c_str(), enabled_arr[j]) == 0)
 					{
 						for (int k = 0; k < 3; k++)
 						{
 							bool found = false;
-							string str;
+							string str= "";
 							if (stricmp(optionpick[k].enabled, retro->variables[i].var.c_str()) == 0)
-							{
 								str = optionpick[k].disabled;
-								found = true;
-							}
 							else if (stricmp(optionpick[k].disabled, retro->variables[i].var.c_str()) == 0)
-							{
 								str = optionpick[k].enabled;
-								found = true;
-							}
+                            if (str != "")found = true;
 							if (found)
 							{
 								if (isupper(retro->variables[i].var[0]))
@@ -570,15 +565,15 @@ public:
 				options.push_back(str);
 			}
 
-            LPWSTR **wszArray = new LPWSTR*[options.size() + 1];
+            LPWSTR **optionsarr = new LPWSTR*[options.size() + 1];
             int j = 0;
             for (j; j < options.size(); j++) {
-               wszArray[j] = new LPWSTR[options[j].length()];
-               lstrcpy((LPWSTR)wszArray[j], options[j].c_str());
+               optionsarr[j] = new LPWSTR[options[j].length()];
+               lstrcpy((LPWSTR)optionsarr[j], options[j].c_str());
             }
-            wszArray[j] = NULL;
+            optionsarr[j] = NULL;
 
-            m_grid.SetSubItem(variable_int, 1, PropCreateList(varname.c_str(), (LPCTSTR*)wszArray));
+            m_grid.SetSubItem(variable_int, 1, PropCreateList(varname.c_str(), (LPCTSTR*)optionsarr));
             HPROPERTY hDisabled = m_grid.GetProperty(variable_int, 1);
             TCHAR szValue[100] = { 0 };
             hDisabled->GetDisplayValue(szValue, sizeof(szValue) / sizeof(TCHAR));
@@ -587,13 +582,12 @@ public:
             vValue.ChangeType(VT_BSTR);
             m_grid.SetItemValue(hDisabled, &vValue);
 
-            for (j = 0; j < options.size(); j++) {
-               delete wszArray[j];
-            }
-			delete []wszArray;
+            for (j = 0; j < options.size(); j++)
+               delete optionsarr[j];
+			delete []optionsarr;
          }
          variable_int++;
-          }
+         }
       }
       return TRUE;
    }

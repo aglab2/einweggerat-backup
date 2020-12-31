@@ -61,7 +61,7 @@
       <Filter>IO</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\mini_al.h">
-      <Filter>IO</Filter>
+      <Filter>3rdparty</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
