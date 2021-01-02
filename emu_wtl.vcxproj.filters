@@ -60,8 +60,11 @@
     <ClInclude Include="io\input.h">
       <Filter>IO</Filter>
     </ClInclude>
-    <ClInclude Include="3rdparty\mini_al.h">
+    <ClInclude Include="..\3rdparty-deps\mini_al.h">
       <Filter>3rdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="io\sokol_audio.h">
+      <Filter>IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

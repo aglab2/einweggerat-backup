@@ -3,8 +3,12 @@
 #define THREADS_IMPLEMENTATION
 #define RESAMPLER_IMPLEMENTATION
 #include "../mudlib.h"
+
+
+
 #include "audio.h"
-#include "../../3rdparty-deps/mini_al.h"
+#define SOKOL_AUDIO_IMPL
+#include "../../3rdparty-deps/sokol_audio.h"
 #include "../../3rdparty-deps/resampler.h"
 #include "../../3rdparty-deps/rthreads.h"
 using namespace std;
@@ -19,9 +23,8 @@ struct fifo_buffer {
 };
 
 struct audio_ctx {
-  mal_context context;
-  mal_device device;
   fifo_buffer *_fifo;
+  saudio_desc shit;
   unsigned client_rate;
   double system_rate;
   void *resample;
@@ -97,11 +100,11 @@ void fifo_read(fifo_buffer_t *buffer, void *in_buf, size_t size) {
   buffer->first = (buffer->first + size) % buffer->size;
 }
 
-static mal_uint32 audio_callback(mal_device *pDevice, mal_uint32 frameCount,
-                                 void *pSamples) {
-  audio_ctx *context = (audio_ctx *)pDevice->pUserData;
+
+static DWORD audio_callback(float* buffer, int num_frames, int num_channels, void* user_data) {
+  audio_ctx *context = (audio_ctx *)user_data;
   slock_lock(context->callback_lock);
-  frameCount *= mal_get_bytes_per_frame(mal_format_f32, pDevice->channels);
+  num_frames *= num_channels* sizeof(float);
   auto amount_buf = [=](auto out, auto count) {
     size_t amount = fifo_read_avail(context->_fifo);
     amount = (count >= amount) ? amount : count;
@@ -109,8 +112,8 @@ static mal_uint32 audio_callback(mal_device *pDevice, mal_uint32 frameCount,
     scond_signal(context->condz);
     return amount;
   };
-  int ret = amount_buf((uint8_t *)pSamples, frameCount) /
-            mal_get_bytes_per_frame(mal_format_f32, pDevice->channels);
+  int ret = amount_buf((uint8_t *)buffer, num_frames) /
+      (num_channels * sizeof(float));
   slock_unlock(context->callback_lock);
   return ret;
 }
@@ -123,37 +126,39 @@ bool audio_init(double refreshra, float input_srate, float fps) {
   double system_fps = fps;
   if (fabs(1.0f - system_fps / refreshra) <= 0.05)
     audio_ctx_s.system_rate *= (refreshra / system_fps);
-  mal_device_config config =
-      mal_device_config_init_playback(mal_format_f32, 2, 0, audio_callback);
-  config.bufferSizeInFrames = FRAME_COUNT;
-  if (mal_device_init(NULL, mal_device_type_playback, NULL, &config,
-                      &audio_ctx_s, &audio_ctx_s.device) != MAL_SUCCESS) {
-    return false;
-  }
-  audio_ctx_s.client_rate = audio_ctx_s.device.sampleRate;
+
+
+   audio_ctx_s.shit.buffer_frames =  FRAME_COUNT;
+   audio_ctx_s.shit.packet_frames = _SAUDIO_DEFAULT_PACKET_FRAMES;
+   audio_ctx_s.shit.num_packets =  _SAUDIO_DEFAULT_NUM_PACKETS;
+   audio_ctx_s.shit.num_channels = 2;
+   audio_ctx_s.shit.sample_rate = 44100;
+   audio_ctx_s.shit.stream_userdata_cb = audio_callback;
+   audio_ctx_s.shit.user_data = (audio_ctx*)&audio_ctx_s;
+
+
+  audio_ctx_s.client_rate = audio_ctx_s.shit.sample_rate;
   audio_ctx_s.resample = resampler_sinc_init();
   // allow for tons of space in the tank
   size_t outsamples_max = (FRAME_COUNT * 4 * sizeof(float));
-  size_t sampsize =
-      (mal_device_get_buffer_size_in_bytes(&audio_ctx_s.device) * 4);
+  size_t sampsize = (FRAME_COUNT * (2 * sizeof(float)));
   audio_ctx_s._fifo = fifo_new(sampsize); // number of bytes
-
   audio_ctx_s.output_float =
       new float[outsamples_max]; // spare space for resampler
   audio_ctx_s.input_float = new float[outsamples_max];
-  if (mal_device_start(&audio_ctx_s.device) != MAL_SUCCESS)
-    return false;
 
   uint8_t *tmp = (uint8_t *)calloc(1, sampsize);
   if (tmp) {
     fifo_write(audio_ctx_s._fifo, tmp, sampsize);
     free(tmp);
   }
+
+  saudio_setup(audio_ctx_s.shit);
   return true;
 }
 void audio_destroy() {
   {
-    mal_device_stop(&audio_ctx_s.device);
+    saudio_shutdown();
     fifo_free(audio_ctx_s._fifo);
     scond_free(audio_ctx_s.condz);
     slock_free(audio_ctx_s.cond_lock);
@@ -162,6 +167,23 @@ void audio_destroy() {
     delete[] audio_ctx_s.output_float;
     resampler_sinc_free(audio_ctx_s.resample);
   }
+}
+
+
+
+void s16tof(void* dst, const void* src, unsigned int count)
+{
+
+    float* dst_f32 = (float*)dst;
+    const int16_t* src_s16 = (const int16_t*)src;
+
+   unsigned int i;
+    for (i = 0; i < count; i += 1) {
+        float x = (float)src_s16[i];
+        // The fast way.
+        x = x * 0.000030517578125f;         // -32768..32767 to -1..0.999969482421875
+        dst_f32[i] = x;
+    }
 }
 
 void audio_mix(const int16_t *samples, size_t size) {
@@ -178,8 +200,7 @@ void audio_mix(const int16_t *samples, size_t size) {
       ((1.0 - maxdelta) + 2.0 * (double)bufferlevel() * maxdelta) *
       audio_ctx_s.system_rate;
   float drc_ratio = (float)audio_ctx_s.client_rate / (float)newInputFrequency;
-  mal_pcm_s16_to_f32(audio_ctx_s.input_float, samples, in_len,
-                     mal_dither_mode_triangle);
+  s16tof(audio_ctx_s.input_float, samples, in_len);
   src_data.input_frames = size;
   src_data.ratio = drc_ratio;
   src_data.data_in = audio_ctx_s.input_float;

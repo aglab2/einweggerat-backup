@@ -346,7 +346,6 @@ bool core_environment(unsigned cmd, void *data) {
           var++;
       }
 
-    char variable_val2[50] = {0};
     unsigned sz = 0;
     unsigned char *config = load_inputsettings((TCHAR*)retro->core_config.c_str(), &sz);
     if (config) {

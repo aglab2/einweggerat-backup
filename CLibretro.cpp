@@ -113,26 +113,19 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
 
   game_filename_ = game_filename;
   //strip path
-  game_filename_ = game_filename_.substr(0, game_filename_.find_last_of(L"\\/"));
+  game_filename_.erase(0, game_filename_.find_last_of(L"\\/") +1);
   //strip extension
-  game_filename_ = game_filename_.erase(game_filename_.rfind('.'));
+  game_filename_.erase(game_filename_.rfind('.'));
 
   einweg_dir = Mud_Misc::ExePath();
   einweg_dir += L"\\system";
-  sys_name = einweg_dir;
-  save_name = einweg_dir;
-  sram_name = einweg_dir;
+  sys_name = save_name = sram_name = einweg_dir;
   sram_name += L"\\" + game_filename_;
   sram_name += L".sram";
-
-
   core_config = sofile;
   core_config = core_config.erase(core_config.rfind('.'));
-  if (gamespecificoptions) {
-      tstring core_path = sofile;
-      core_path = core_path.erase(core_path.rfind('.'));
+  if (gamespecificoptions)
       core_config += L"\\" + game_filename_ + L".ini";
-  }
   else
       core_config += L".ini";
 
