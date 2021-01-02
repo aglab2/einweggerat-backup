@@ -20,9 +20,7 @@ bool CLibretro::savestate(TCHAR *filename, bool save) {
       if (save) {
         // Get the filesize
         g_retro.retro_serialize(Memory, size);
-        if (Memory)
-          Mud_FileAccess::save_data(Memory, size, filename);
-        free(Memory);
+        Mud_FileAccess::save_data(Memory, size, filename);
       } else {
         unsigned sz;
         BYTE *save_data = (BYTE *)Mud_FileAccess::load_data(filename, &sz);
@@ -33,8 +31,8 @@ bool CLibretro::savestate(TCHAR *filename, bool save) {
         memcpy(Memory, save_data, size);
         g_retro.retro_unserialize(Memory, size);
         free(save_data);
-        free(Memory);
       }
+      free(Memory);
       return true;
     }
   }
@@ -45,8 +43,7 @@ bool CLibretro::savesram(TCHAR *filename, bool save) {
   if (isEmulating) {
     size_t size = g_retro.retro_get_memory_size(RETRO_MEMORY_SAVE_RAM);
     if (size) {
-      BYTE *Memory =
-          (BYTE *)g_retro.retro_get_memory_data(RETRO_MEMORY_SAVE_RAM);
+      BYTE *Memory = (BYTE *)g_retro.retro_get_memory_data(RETRO_MEMORY_SAVE_RAM);
       if (save)
         return Mud_FileAccess::save_data(Memory, size, filename);
       else {
@@ -83,11 +80,8 @@ void CLibretro::core_unload() {
 
 bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
                           TCHAR *game_filename) {
-  TCHAR game_filename_[MAX_PATH] = {0};
-  ZeroMemory(core_config, sizeof(TCHAR) * MAX_PATH);
-  ZeroMemory(save_name, sizeof(TCHAR) * MAX_PATH);
-  ZeroMemory(sys_name, sizeof(TCHAR) * MAX_PATH);
-  ZeroMemory(sram_name, sizeof(TCHAR) * MAX_PATH);
+  tstring game_filename_;
+  tstring einweg_dir;
   g_retro.handle = LoadLibrary(sofile);
   if (!g_retro.handle)
     return false;
@@ -117,31 +111,31 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
   load_retro_sym(retro_get_memory_size);
   load_retro_sym(retro_get_memory_data);
 
-  lstrcpy(game_filename_, game_filename);
-  PathStripPath(game_filename_);
-  PathRemoveExtension(game_filename_);
+  game_filename_ = game_filename;
+  //strip path
+  game_filename_ = game_filename_.substr(0, game_filename_.find_last_of(L"\\/"));
+  //strip extension
+  game_filename_ = game_filename_.erase(game_filename_.rfind('.'));
 
-  TCHAR einweg_dir[MAX_PATH] = {0};
-  lstrcpy(einweg_dir, Mud_Misc::ExePath().c_str());
-  PathAppend(einweg_dir, L"system");
-  lstrcpy(sys_name, einweg_dir);
-  lstrcpy(save_name, einweg_dir);
-  lstrcpy(sram_name, einweg_dir);
-  PathAppend(sram_name, game_filename_);
-  lstrcat(sram_name, L".sram");
+  einweg_dir = Mud_Misc::ExePath();
+  einweg_dir += L"\\system";
+  sys_name = einweg_dir;
+  save_name = einweg_dir;
+  sram_name = einweg_dir;
+  sram_name += L"\\" + game_filename_;
+  sram_name += L".sram";
 
+
+  core_config = sofile;
+  core_config = core_config.erase(core_config.rfind('.'));
   if (gamespecificoptions) {
-    TCHAR core_path[MAX_PATH] = {0};
-    lstrcpy(core_path, sofile);
-    PathRemoveExtension(core_path);
-    lstrcpy(core_config, core_path);
-    PathAppend(core_config, game_filename_);
-    lstrcat(core_config, L".ini");
-  } else {
-    lstrcpy(core_config, sofile);
-    PathRemoveExtension(core_config);
-    lstrcat(core_config, L".ini");
+      tstring core_path = sofile;
+      core_path = core_path.erase(core_path.rfind('.'));
+      core_config += L"\\" + game_filename_ + L".ini";
   }
+  else
+      core_config += L".ini";
+
   // set libretro func pointers
   load_envsymb(g_retro.handle);
   g_retro.retro_init();
@@ -231,8 +225,7 @@ bool CLibretro::loadfile(TCHAR *filename, TCHAR *core_filename,
   }
   struct retro_system_info system_info = {0};
   g_retro.retro_get_system_info(&system_info);
-  tstring sysname = Mud_String::utf8toutf16(system_info.library_name);
-  lstrcpy(core_name, sysname.c_str());
+  core_name = Mud_String::utf8toutf16(system_info.library_name);
   if (!g_retro.retro_load_game(&info)) {
     printf("FAILED TO LOAD ROM!!!!!!!!!!!!!!!!!!");
     return false;
@@ -251,7 +244,7 @@ bool CLibretro::loadfile(TCHAR *filename, TCHAR *core_filename,
   audio_init(refreshr, av.timing.sample_rate, av.timing.fps);
   lastTime = (double)mudtime.milliseconds_now() / 1000;
   isEmulating = true;
-  savesram(sram_name, false);
+  savesram((TCHAR*)sram_name.c_str(), false);
   return true;
 }
 
@@ -271,7 +264,7 @@ void CLibretro::run() {
     TCHAR buffer[200] = {0};
     int len =
         swprintf(buffer, 200, L"einweggerät: %s - %2f ms/frame\n, min %d VPS",
-                 core_name, 1000.0 / double(nbFrames), nbFrames);
+                 core_name.c_str(), 1000.0 / double(nbFrames), nbFrames);
     SetWindowText(emulator_hwnd, buffer);
     nbFrames = 0;
     lastTime += 1.0;
@@ -288,7 +281,7 @@ bool CLibretro::init(HWND hwnd) {
 void CLibretro::kill() {
 
   if (isEmulating) {
-    savesram(sram_name, true);
+    savesram((TCHAR*)sram_name.c_str(), true);
     core_unload();
     isEmulating = false;
     if (info.data)

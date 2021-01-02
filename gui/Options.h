@@ -479,11 +479,9 @@ public:
 						for (int k = 0; k < 3; k++)
 						{
 							bool found = false;
-							string str= "";
-							if (stricmp(optionpick[k].enabled, retro->variables[i].var.c_str()) == 0)
-								str = optionpick[k].disabled;
-							else if (stricmp(optionpick[k].disabled, retro->variables[i].var.c_str()) == 0)
-								str = optionpick[k].enabled;
+							string str;
+                            str = stricmp(optionpick[k].enabled, retro->variables[i].var.c_str()) == 0 ? optionpick[k].disabled : 
+                                (str = (stricmp(optionpick[k].disabled, retro->variables[i].var.c_str()) == 0) ? optionpick[k].enabled : "");
                             if (str != "")found = true;
 							if (found)
 							{

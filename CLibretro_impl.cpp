@@ -52,7 +52,7 @@ const char *load_coresettings(retro_variable *var, CLibretro *retro) {
 
 void save_inputsettings(unsigned char *data_ptr, unsigned data_sz,
                         CLibretro *retro) {
-  FILE *fp = _wfopen(retro->core_config, L"r");
+  FILE *fp = _wfopen(retro->core_config.c_str(), L"r");
   ini_t *ini = NULL;
   char *data = NULL;
   if (fp) {
@@ -62,7 +62,7 @@ void save_inputsettings(unsigned char *data_ptr, unsigned data_sz,
     data = (char *)malloc(size + 1);
     fread(data, 1, size, fp);
     fclose(fp);
-    fp = _wfopen(retro->core_config, L"w");
+    fp = _wfopen(retro->core_config.c_str(), L"w");
     data[size] = '\0';
     ini = ini_load(data, NULL);
     int section =
@@ -93,7 +93,7 @@ void save_inputsettings(unsigned char *data_ptr, unsigned data_sz,
 }
 
 void save_coresettings(CLibretro *retro) {
-  FILE *fp = _wfopen(retro->core_config, L"r+");
+  FILE *fp = _wfopen(retro->core_config.c_str(), L"r+");
   ini_t *ini = NULL;
   char *data = NULL;
   if (fp) {
@@ -149,7 +149,7 @@ void init_coresettings(retro_variable *var, CLibretro *retro) {
     var++;
   }
 
-  fp = _wfopen(retro->core_config, L"r");
+  fp = _wfopen(retro->core_config.c_str(), L"r");
   if (!fp) {
     // create a new file with defaults
     ini_t *ini = ini_create(NULL);
@@ -166,7 +166,7 @@ void init_coresettings(retro_variable *var, CLibretro *retro) {
     char *data = (char *)malloc(size);
     size = ini_save(ini, data, size); // Actually save the file
     ini_destroy(ini);
-    fp = _wfopen(retro->core_config, L"w");
+    fp = _wfopen(retro->core_config.c_str(), L"w");
     fwrite(data, 1, size, fp);
     fclose(fp);
     free(data);
@@ -210,7 +210,7 @@ void init_coresettings(retro_variable *var, CLibretro *retro) {
       int size = ini_save(ini, NULL, 0); // Find the size needed
       char *data = (char *)malloc(size);
       size = ini_save(ini, data, size); // Actually save the file
-      fp = _wfopen(retro->core_config, L"w");
+      fp = _wfopen(retro->core_config.c_str(), L"w");
       fwrite(data, 1, size, fp);
       fclose(fp);
       free(data);
@@ -348,7 +348,7 @@ bool core_environment(unsigned cmd, void *data) {
 
     char variable_val2[50] = {0};
     unsigned sz = 0;
-    unsigned char *config = load_inputsettings(retro->core_config, &sz);
+    unsigned char *config = load_inputsettings((TCHAR*)retro->core_config.c_str(), &sz);
     if (config) {
       Mem_File_Reader out(config, sz);
       const char *err = input_device->load(out);

@@ -72,11 +72,11 @@ public:
 
 	
 	std::vector<core_vars> variables;
-	TCHAR sys_name[MAX_PATH];
-	TCHAR save_name[MAX_PATH];
-	TCHAR sram_name[MAX_PATH];
-	TCHAR core_config[MAX_PATH];
-	TCHAR core_name[MAX_PATH];
+	tstring sys_name;
+	tstring save_name;
+	tstring sram_name;
+	tstring core_config;
+	tstring core_name;
 	bool variables_changed;
 	BOOL isEmulating;
 };
