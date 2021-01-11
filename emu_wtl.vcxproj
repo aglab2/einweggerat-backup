@@ -205,7 +205,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\3rdparty-deps\mini_al.h" />
+    <ClInclude Include="..\3rdparty-deps\sokol_audio.h" />
     <ClInclude Include="CLibretro.h" />
     <ClInclude Include="gui\emu_wtl.h" />
     <ClInclude Include="gui\MyWindow.h" />
@@ -218,7 +218,6 @@
     <ClInclude Include="io\gl_render.h" />
     <ClInclude Include="io\guid_container.h" />
     <ClInclude Include="io\input.h" />
-    <ClInclude Include="io\sokol_audio.h" />
     <ClInclude Include="mudlib.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
