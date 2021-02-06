@@ -75,11 +75,7 @@ int Run(LPTSTR cmdline = NULL, int nCmdShow = SW_SHOWDEFAULT)
     dlgMain.SetWindowPos(0, 100, 100, 640, 480, SWP_NOZORDER);
     dlgMain.CenterWindow();
     dlgMain.SetIcon(LoadIcon(_Module.GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
-#ifdef _WIN64
-    dlgMain.SetWindowText(L"einweggerät - 64bit");
-#else
-    dlgMain.SetWindowText(L"einweggerät - 32bit");
-#endif
+    dlgMain.SetWindowText(L"somelibretrothing");
     CMenu menu;
     menu.Attach(LoadMenu(_Module.GetResourceInstance(), MAKEINTRESOURCE(MENU_MAINFRAME)));
     dlgMain.SetMenu(menu);

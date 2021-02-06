@@ -39,7 +39,7 @@ public:
                             BOOL & /*bHandled*/) {
     // CString verinf0 = SVN_REVISION;
     CString date = "Built on " __DATE__ " at " __TIME__ " (GMT+10)";
-    CString verinfo = "einweggerät public build " GIT_VERSION;
+    CString verinfo = "public build " GIT_VERSION;
 
     CString greetz;
 
@@ -51,8 +51,6 @@ public:
     version_number = GetDlgItem(IDC_APPVER);
     version_number.SetWindowText(verinfo);
 
-    greetz += "einweggerät\r\n";
-    greetz += "-----------\r\n";
     greetz += "Keys: \r\n";
     greetz += "F1 : Load Savestate\r\n";
     greetz += "F2 : Save Savestate\r\n";
@@ -64,7 +62,7 @@ public:
     greetz += "-q : Per-game configuration\r\n";
     greetz += "\n";
     greetz +=
-        "Example: einweggerat.exe -r somerom.sfc -c snes9x_libretro.dll\r\n";
+        "Example: somelibretrothing.exe -r somerom.sfc -c snes9x_libretro.dll\r\n";
     greetz += "-----------\r\n";
     greetz += "Greetz:\r\n";
     greetz += "Higor Eurípedes\r\n";
@@ -78,7 +76,7 @@ public:
 
     greets.SetWindowText(greetz);
     website.SubclassWindow(GetDlgItem(IDC_LINK));
-    website.SetHyperLink(_T("http://rebote.net"));
+    website.SetHyperLink(_T("http://twitter.com/mountnside"));
     return TRUE;
   }
 };

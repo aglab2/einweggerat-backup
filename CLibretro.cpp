@@ -256,7 +256,7 @@ void CLibretro::run() {
              // printf and reset timer
     TCHAR buffer[200] = {0};
     int len =
-        swprintf(buffer, 200, L"einweggerät: %s - %2f ms/frame\n, min %d VPS",
+        swprintf(buffer, 200, L"%s - %2f ms/frame\n, min %d VPS",
                  core_name.c_str(), 1000.0 / double(nbFrames), nbFrames);
     SetWindowText(emulator_hwnd, buffer);
     nbFrames = 0;

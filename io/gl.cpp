@@ -70,23 +70,7 @@ static const char* g_fshader_src = "#version 330\n"
 uintptr_t core_get_current_framebuffer() { return g_video.fbo_id; }
 
 void ortho2d(float m[4][4], float left, float right, float bottom, float top) {
-	m[0][0] = 1;
-	m[0][1] = 0;
-	m[0][2] = 0;
-	m[0][3] = 0;
-	m[1][0] = 0;
-	m[1][1] = 1;
-	m[1][2] = 0;
-	m[1][3] = 0;
-	m[2][0] = 0;
-	m[2][1] = 0;
-	m[2][2] = 1;
-	m[2][3] = 0;
-	m[3][0] = 0;
-	m[3][1] = 0;
-	m[3][2] = 0;
 	m[3][3] = 1;
-
 	m[0][0] = 2.0f / (right - left);
 	m[1][1] = 2.0f / (top - bottom);
 	m[2][2] = -1.0f;
@@ -130,7 +114,7 @@ void init_shaders() {
 	glGenBuffers(1, &g_shader.vbo);
 	glProgramUniform1i(g_shader.fshader, g_shader.u_tex, 0);
 
-	float m[4][4];
+	float m[4][4] = { 0 };
 	if (g_video.hw.bottom_left_origin)
 		ortho2d(m, -1, 1, 1, -1);
 	else
