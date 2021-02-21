@@ -102,7 +102,7 @@ public:
 	   retro = CLibretro::GetInstance();
       input = input::GetInstance();
       guids = input->guids;
-      di = create_dinput();
+      input->di = create_dinput();
       if (di->open(input->lpDI, GetParent(), input->guids))
       {
          return 0;

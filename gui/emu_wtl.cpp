@@ -75,11 +75,7 @@ int Run(LPTSTR cmdline = NULL, int nCmdShow = SW_SHOWDEFAULT)
     dlgMain.SetWindowPos(0, 100, 100, 640, 480, SWP_NOZORDER);
     dlgMain.CenterWindow();
     dlgMain.SetIcon(LoadIcon(_Module.GetResourceInstance(), MAKEINTRESOURCE(IDI_ICON1)));
-#ifdef _WIN64
-    dlgMain.SetWindowText(L"einweggerät - 64bit");
-#else
-    dlgMain.SetWindowText(L"einweggerät - 32bit");
-#endif
+    dlgMain.SetWindowText(L"somelibretrothing");
     CMenu menu;
     menu.Attach(LoadMenu(_Module.GetResourceInstance(), MAKEINTRESOURCE(MENU_MAINFRAME)));
     dlgMain.SetMenu(menu);
@@ -109,7 +105,6 @@ int Run(LPTSTR cmdline = NULL, int nCmdShow = SW_SHOWDEFAULT)
             a.add<string>("core_name", 'c', "core filename", true, "");
             a.add<string>("rom_name", 'r', "rom filename", true, "");
             a.add("pergame", 'g', "per-game configuration");
-            a.add("threads", 't', "use multithreaded core execution");
             a.parse_check(argc, cmdargptr);
             printf("\nPress any key to continue....\n");
             _Module.RemoveMessageLoop();
@@ -134,7 +129,6 @@ int Run(LPTSTR cmdline = NULL, int nCmdShow = SW_SHOWDEFAULT)
     a.add<string>("core_name", 'c', "core filename", true, "");
     a.add<string>("rom_name", 'r', "rom filename", true, "");
     a.add("pergame", 'g', "per-game configuration");
-    a.add("threads", 't', "use multithreaded core execution");
     a.parse_check(argc, cmdargptr);
 
     wstring rom = Mud_String::utf8toutf16(a.get<string>("rom_name"));
