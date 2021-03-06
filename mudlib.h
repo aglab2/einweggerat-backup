@@ -213,41 +213,6 @@ class Mud_Misc
 {
 public:
 
-	static void memcpy(void* dest, const void* src, size_t amount)
-	{
-		unsigned char* ptr_d = (unsigned char*)dest;
-		unsigned char* ptr_s = (unsigned char*)src;
-		for (int i = 0; i < amount; i++)
-		{
-			ptr_d[i] = ptr_s[i];
-		}
-	}
-
-	static void memset(void* dest, int val, size_t length)
-	{
-		unsigned char* ptr_c;
-		ptr_c = (unsigned char*)dest;
-		for (int i = 0; i < length; i++)
-			ptr_c[i] = val;
-	}
-
-	static void* alloc(size_t size)
-	{
-		return HeapAlloc(GetProcessHeap(), 0, size);
-	}
-
-	static void free(void* p)
-	{
-		HeapFree(GetProcessHeap(), 0, p);
-	}
-
-	static void* alloczeroed(size_t size)
-	{
-		void* buf = alloc(size);
-		memset(buf,0, size);
-		return (buf);
-	}
-
 
 	unsigned int crc32(const void* data, unsigned int length)
 	{
