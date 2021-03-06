@@ -16,8 +16,8 @@ unsigned char *load_inputsettings(TCHAR *path, unsigned *size) {
     int size_ = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     char *data = (char *)malloc(size_ + 1);
+    memset(data, 0, size_ + 1);
     fread(data, 1, size_, fp);
-    data[size_] = '\0';
     fclose(fp);
     ini_t *ini = ini_load(data, NULL);
     free(data);
@@ -60,10 +60,10 @@ void save_inputsettings(unsigned char *data_ptr, unsigned data_sz,
     int size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     data = (char *)malloc(size + 1);
+    memset(data, 0, size + 1);
     fread(data, 1, size, fp);
     fclose(fp);
     fp = _wfopen(retro->core_config.c_str(), L"w");
-    data[size] = '\0';
     ini = ini_load(data, NULL);
     int section =
         ini_find_section(ini, "Input Settings", strlen("Input Settings"));
@@ -101,9 +101,9 @@ void save_coresettings(CLibretro *retro) {
     int size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     data = (char *)malloc(size + 1);
+    memset(data, 0, size + 1);
     fread(data, 1, size, fp);
     rewind(fp);
-    data[size] = '\0';
     ini = ini_load(data, NULL);
     int section =
         ini_find_section(ini, "Core Settings", strlen("Core Settings"));
@@ -118,6 +118,7 @@ void save_coresettings(CLibretro *retro) {
     free(data);
     size = ini_save(ini, NULL, 0); // Find the size needed
     data = (char *)malloc(size);
+    memset(data, 0, size);
     size = ini_save(ini, data, size); // Actually save the file
     fwrite(data, 1, size, fp);
     ini_destroy(ini);
@@ -175,8 +176,8 @@ void init_coresettings(retro_variable *var, CLibretro *retro) {
     int size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
     char *data = (char *)malloc(size + 1);
+    memset(data, 0, size + 1);
     fread(data, 1, size, fp);
-    data[size] = '\0';
     fclose(fp);
     ini_t *ini = ini_load(data, NULL);
     free(data);
