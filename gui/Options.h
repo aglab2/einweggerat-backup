@@ -69,7 +69,7 @@ public:
 
    LRESULT NotifyHandler(int idCtrl, LPNMHDR pnmh, BOOL&/*bHandled*/) {
       //	KillTimer(0x1337);
-      while (!process_events(di->read()))Sleep(10);
+      while (!process_events(di->read()))Sleep(1);
       std::tostringstream event_text;
       format_event(last_event, event_text);
       int n = ListView_GetSelectionMark(assign);
@@ -102,7 +102,7 @@ public:
 	   retro = CLibretro::GetInstance();
       input = input::GetInstance();
       guids = input->guids;
-      input->di = create_dinput();
+      di = create_dinput();
       if (di->open(input->lpDI, GetParent(), input->guids))
       {
          return 0;
