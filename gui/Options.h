@@ -208,7 +208,7 @@ private:
       }
       else if (e.type == dinput::di_event::ev_xinput)
       {
-         out << _T("Xbox360 controller #");
+         out << _T("Xinput controller #");
          out << e.xinput.index + 1;
          out << _T(' ');
 
