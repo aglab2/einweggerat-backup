@@ -37,18 +37,18 @@ class dinput_i : public dinput {
   struct joy {
     unsigned serial;
     LPDIRECTINPUTDEVICE8 device;
-    GUID GuidInstance;
+    unsigned long vidpid;
 #ifdef UNICODE
     std::wstring name;
 #else
     std::string name;
 #endif
 
-    joy(unsigned serial, const GUID &GuidInstance, const TCHAR *name,
+    joy(unsigned serial, const unsigned long &GuidInstance, const TCHAR *name,
         LPDIRECTINPUTDEVICE8 device) {
       this->serial = serial;
       this->device = device;
-      this->GuidInstance = GuidInstance;
+      this->vidpid = GuidInstance;
       this->name = name;
     }
   };
@@ -338,7 +338,7 @@ public:
     std::vector<joy>::iterator it;
     for (it = joysticks.begin(); it < joysticks.end(); ++it) {
       it->device->Release();
-      guids->remove(it->GuidInstance);
+      guids->remove(it->vidpid);
     }
 
     if (lpdMouse) {
@@ -724,8 +724,8 @@ private:
       return DIENUM_CONTINUE;
     }
 
-    joysticks.push_back(joy(guids->add(lpDev->guidInstance),
-                            lpDev->guidInstance, lpDev->tszInstanceName,
+    joysticks.push_back(joy(guids->add(lpDev->guidInstance.Data1),
+                            lpDev->guidInstance.Data1, lpDev->tszInstanceName,
                             lpdJoy));
 
     return DIENUM_CONTINUE;

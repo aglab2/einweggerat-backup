@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <io.h>
 #include <string>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -161,12 +163,21 @@ public:
 class Mud_FileAccess
 {
 public:
+	static unsigned get_filesize(FILE* fp)
+	{
+		unsigned size = 0;
+		unsigned pos = ftell(fp);
+		fseek(fp, 0, SEEK_END);
+		size = ftell(fp);
+		fseek(fp, pos, SEEK_SET);
+		return size;
+	}
+
 	static unsigned get_filesize(const TCHAR *path)
 	{
 		FILE *input = _wfopen((wchar_t*)path, L"rb");
 		if (!input)return NULL;
-		fseek(input, 0, SEEK_END);
-		unsigned size = ftell(input);
+		unsigned size = get_filesize(input);
 		fclose(input);
 		input = NULL;
 		return size;
@@ -186,8 +197,7 @@ public:
 	{
 		FILE *input = _wfopen((wchar_t*)path, L"rb");
 		if (!input)return NULL;
-		fseek(input, 0, SEEK_END);
-		unsigned Size = ftell(input);
+		unsigned Size = get_filesize(input);
 		if (!Size)
 		{
 			err:
@@ -195,7 +205,6 @@ public:
 			return NULL;
 		}
 		*size = Size;
-		rewind(input);
 		BYTE *Memory = (BYTE *)malloc(Size);
 		if (!Memory) goto err;
 		int res = fread(Memory, 1, Size, input);
@@ -212,6 +221,10 @@ public:
 class Mud_Misc
 {
 public:
+	static void vector_appendbytes(std::vector<uint8_t> &vec ,uint8_t* bytes, size_t len)
+	{
+		vec.insert(vec.end(), bytes, bytes + len);
+	}
 
 
 	unsigned int crc32(const void* data, unsigned int length)

@@ -117,8 +117,6 @@ bool audio_init(double refreshra, float input_srate, float fps) {
 
 
     audio_ctx_s.shit.buffer_frames = FRAME_COUNT;
-    audio_ctx_s.shit.packet_frames = _SAUDIO_DEFAULT_PACKET_FRAMES;
-    audio_ctx_s.shit.num_packets = _SAUDIO_DEFAULT_NUM_PACKETS;
     audio_ctx_s.shit.num_channels = 2;
     audio_ctx_s.shit.sample_rate = 44100;
     audio_ctx_s.shit.stream_userdata_cb = audio_callback;

@@ -426,6 +426,7 @@ public:
       LPNMPROPERTYITEM pnpi = (LPNMPROPERTYITEM)pnmh;
       int type = pnpi->prop->GetKind();
       LPCTSTR name = pnpi->prop->GetName();
+      wstring name_str = name;
       if (type == 4)
       {
          TCHAR szValue[100] = { 0 };
@@ -433,15 +434,12 @@ public:
          CComVariant vValue;
          pnpi->prop->GetValue(&vValue);
          vValue.ChangeType(VT_BSTR);
-
+         wstring var = szValue;
          for (int i = 0; i < retro->variables.size(); i++)
          {
             wstring str = Mud_String::utf8toutf16(retro->variables[i].name);
-            if (lstrcmpW(str.c_str(), (LPCTSTR)name) == 0)
-            {
-               wstring var = szValue;
+            if (str==name)
                retro->variables[i].var = Mud_String::utf16toutf8(var);
-            }
 
          }
 		 retro->variables_changed = true;

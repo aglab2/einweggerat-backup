@@ -72,6 +72,7 @@ public:
 
 	
 	std::vector<core_vars> variables;
+
 	tstring sys_name;
 	tstring save_name;
 	tstring sram_name;

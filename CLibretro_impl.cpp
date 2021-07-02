@@ -10,19 +10,13 @@
 using namespace std;
 
 unsigned char *load_inputsettings(TCHAR *path, unsigned *size) {
-  FILE *fp = _wfopen(path, L"r");
-  if (fp) {
-    fseek(fp, 0, SEEK_END);
-    int size_ = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    char *data = (char *)malloc(size_ + 1);
-    memset(data, 0, size_ + 1);
-    fread(data, 1, size_, fp);
-    fclose(fp);
-    ini_t *ini = ini_load(data, NULL);
-    free(data);
-    int section =
-        ini_find_section(ini, "Input Settings", strlen("Input Settings"));
+  unsigned size_ = Mud_FileAccess::get_filesize(path);
+ 
+  if (size_) {
+    unsigned char* data1 = Mud_FileAccess::load_data(path, &size_);
+    ini_t *ini = ini_load((char*)data1, NULL);
+    free(data1);
+    int section = ini_find_section(ini, "Input Settings", strlen("Input Settings"));
     if (section == INI_NOT_FOUND) {
       ini_destroy(ini);
       return NULL;
@@ -43,30 +37,22 @@ unsigned char *load_inputsettings(TCHAR *path, unsigned *size) {
 
 const char *load_coresettings(retro_variable *var, CLibretro *retro) {
   for (int i = 0; i < retro->variables.size(); i++) {
-    if (strcmp(retro->variables[i].name.c_str(), var->key) == 0) {
+    if (strcmp(retro->variables[i].name.c_str(), var->key) == 0)
       return retro->variables[i].var.c_str();
-    }
   }
   return NULL;
 }
 
 void save_inputsettings(unsigned char *data_ptr, unsigned data_sz,
                         CLibretro *retro) {
-  FILE *fp = _wfopen(retro->core_config.c_str(), L"r");
   ini_t *ini = NULL;
-  char *data = NULL;
-  if (fp) {
-    fseek(fp, 0, SEEK_END);
-    int size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    data = (char *)malloc(size + 1);
-    memset(data, 0, size + 1);
-    fread(data, 1, size, fp);
-    fclose(fp);
-    fp = _wfopen(retro->core_config.c_str(), L"w");
-    ini = ini_load(data, NULL);
-    int section =
-        ini_find_section(ini, "Input Settings", strlen("Input Settings"));
+  TCHAR* config_path = (TCHAR*)retro->core_config.c_str();
+  unsigned size_ = Mud_FileAccess::get_filesize(config_path);
+  if (size_)
+  {
+    char* data = (char*)Mud_FileAccess::load_data(config_path, &size_);
+    ini = ini_load((char*)data, NULL);
+    int section = ini_find_section(ini, "Input Settings", strlen("Input Settings"));
     unsigned outbaselen = 0;
     TCHAR *data2 = Mud_Base64::encode(data_ptr, data_sz, &outbaselen);
     string ansi = Mud_String::utf16toutf8(data2);
@@ -81,143 +67,158 @@ void save_inputsettings(unsigned char *data_ptr, unsigned data_sz,
     }
     free(data2);
     free(data);
-    size = ini_save(ini, NULL, 0); // Find the size needed
-    data = (char *)malloc(size);
-    size = ini_save(ini, data, size); // Actually save the file
-    fwrite(data, 1, size, fp);
+
+    size_ = ini_save(ini, NULL, 0); // Find the size needed
+    data = (char *)malloc(size_);
+    size_ = ini_save(ini, data, size_); // Actually save the file
+    Mud_FileAccess::save_data((unsigned char*)data, size_, config_path);
     ini_destroy(ini);
-    fclose(fp);
+    if (data)
+        free(data);
   }
-  if (data)
-    free(data);
+  
 }
 
 void save_coresettings(CLibretro *retro) {
-  FILE *fp = _wfopen(retro->core_config.c_str(), L"r+");
+ 
   ini_t *ini = NULL;
-  char *data = NULL;
-  if (fp) {
-    fseek(fp, 0, SEEK_END);
-    int size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    data = (char *)malloc(size + 1);
-    memset(data, 0, size + 1);
-    fread(data, 1, size, fp);
-    rewind(fp);
+  unsigned size_ = Mud_FileAccess::get_filesize((TCHAR*)retro->core_config.c_str());
+  TCHAR* config_path = (TCHAR*)retro->core_config.c_str();
+  if (size_) {
+    char* data = (char*)Mud_FileAccess::load_data(config_path, &size_);
     ini = ini_load(data, NULL);
-    int section =
-        ini_find_section(ini, "Core Settings", strlen("Core Settings"));
+    int section = ini_find_section(ini, "Core Settings", strlen("Core Settings"));
     for (int i = 0; i < retro->variables.size(); i++) {
 
       int idx = ini_find_property(ini, section,
                                   (char *)retro->variables[i].name.c_str(),
-                                  strlen(retro->variables[i].name.c_str()));
+                                  retro->variables[i].name.length());
       ini_property_value_set(ini, section, idx, retro->variables[i].var.c_str(),
-                             strlen(retro->variables[i].var.c_str()));
+                             retro->variables[i].var.length());
     }
     free(data);
-    size = ini_save(ini, NULL, 0); // Find the size needed
-    data = (char *)malloc(size);
-    memset(data, 0, size);
-    size = ini_save(ini, data, size); // Actually save the file
-    fwrite(data, 1, size, fp);
+
+
+    size_ = ini_save(ini, NULL, 0); // Find the size needed
+    data = (char *)malloc(size_);
+    memset(data, 0, size_);
+    size_ = ini_save(ini, data, size_); // Actually save the file
+    Mud_FileAccess::save_data((unsigned char*)data, size_, config_path);
     ini_destroy(ini);
-    fclose(fp);
-  }
-  if (data)
     free(data);
+  }
+  
 }
 
 void init_coresettings(retro_variable *var, CLibretro *retro) {
-  FILE *fp = NULL;
-  std::vector<CLibretro::core_vars> variables;
   // set up core variable information and default key settings
-  while (var->value != NULL) {
-    CLibretro::core_vars vars_struct;
-    vars_struct.name = var->key;
-    vars_struct.config_visible = true;
-    std::string description = var->value;
-    std::string::size_type pos = description.find(';');
-    vars_struct.description = description.substr(0, pos);
-    pos += 2; // skip ; and space to first variable
-    vars_struct.usevars = description.substr(pos, string::npos);
-    description = description.substr(pos, string::npos);
-    pos = description.find('|');
-    if (pos != std::string::npos)
-      description = description.substr(0, pos);
-    vars_struct.var = description;
-    variables.push_back(vars_struct);
-    var++;
-  }
 
-  fp = _wfopen(retro->core_config.c_str(), L"r");
-  if (!fp) {
+  TCHAR* config_path = (TCHAR*)retro->core_config.c_str();
+
+  std::vector<CLibretro::core_vars> variables;
+  while (var->value != NULL) {
+      CLibretro::core_vars vars_struct;
+      vars_struct.name = var->key;
+      vars_struct.config_visible = true;
+      std::string description = var->value;
+      std::string::size_type pos = description.find(';');
+      vars_struct.description = description.substr(0, pos);
+      pos += 2; // skip ; and space to first variable
+      //get all variables
+      vars_struct.usevars = description.substr(pos, string::npos);
+      description = description.substr(pos, string::npos);
+      //find first option in list, it is default
+      pos = description.find('|');
+      if (pos != std::string::npos)
+          description = description.substr(0, pos);
+      vars_struct.var = description;
+      variables.push_back(vars_struct);
+      var++;
+  }
+  
+  
+
+  int size_ = Mud_FileAccess::get_filesize(config_path);
+  if (!size_) {
+      redo:
+      retro->variables=variables;
+      
     // create a new file with defaults
+    //create cache of core options
     ini_t *ini = ini_create(NULL);
     int section =
         ini_section_add(ini, "Core Settings", strlen("Core Settings"));
-    for (int i = 0; i < variables.size(); i++) {
-      ini_property_add(ini, section, (char *)variables[i].name.c_str(),
-                       strlen(variables[i].name.c_str()),
-                       (char *)variables[i].var.c_str(),
-                       strlen(variables[i].var.c_str()));
-      retro->variables.push_back(variables[i]);
+    for (int i = 0; i < retro->variables.size(); i++) {
+      ini_property_add(ini, section, (char *)retro->variables[i].name.c_str(),
+                       retro->variables[i].name.length(),
+                       (char *)retro->variables[i].var.c_str(),
+                      retro->variables[i].var.length());
+      
     }
+
+    for (int i = 0; i < retro->variables.size(); i++)
+    {
+        std::string variable_name = retro->variables[i].name+ "_usedvars_";
+        ini_property_add(ini, section, variable_name.c_str(), variable_name.length(),
+            (char*)retro->variables[i].usevars.c_str(), retro->variables[i].usevars.length());
+        variable_name = retro->variables[i].name+ "_description_";
+        ini_property_add(ini, section, variable_name.c_str(), variable_name.length(),
+            (char*)retro->variables[i].description.c_str(), retro->variables[i].description.length());
+    }
+
+    char lengthstr[33] = { 0 };
+    itoa(retro->variables.size(), lengthstr, 10);
+    ini_property_add(ini, section, "usedvars_num", strlen("usedvars_num"), lengthstr, strlen(lengthstr));
+
     int size = ini_save(ini, NULL, 0); // Find the size needed
     char *data = (char *)malloc(size);
     size = ini_save(ini, data, size); // Actually save the file
     ini_destroy(ini);
-    fp = _wfopen(retro->core_config.c_str(), L"w");
-    fwrite(data, 1, size, fp);
-    fclose(fp);
+    Mud_FileAccess::save_data((unsigned char*)data, size, config_path);
     free(data);
   } else {
-    fseek(fp, 0, SEEK_END);
-    int size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    char *data = (char *)malloc(size + 1);
-    memset(data, 0, size + 1);
-    fread(data, 1, size, fp);
-    fclose(fp);
+    //load
+     char* data = (char*)Mud_FileAccess::load_data(config_path, (unsigned int*)&size_);
     ini_t *ini = ini_load(data, NULL);
     free(data);
-    int num_vars = variables.size();
-    int section =
-        ini_find_section(ini, "Core Settings", strlen("Core Settings"));
-    int vars_infile = ini_property_count(ini, section);
 
-    if (vars_infile != num_vars) {
-      fclose(fp);
+
+    int section = ini_find_section(ini, "Core Settings", strlen("Core Settings"));
+    int idx = ini_find_property(ini, section, "usedvars_num",strlen("usedvars_num"));
+    const char* numvars = ini_property_value(ini, section, idx);
+    int vars_infile =atoi(numvars);
+    if (variables.size() != vars_infile)
+    {
+        //rebuild cache.
+        ini_destroy(ini);
+        goto redo;
     }
     bool save = false;
-    for (int i = 0; i < num_vars; i++) {
-      int idx =
-          ini_find_property(ini, section, (char *)variables[i].name.c_str(),
-                            strlen(variables[i].name.c_str()));
-      if (idx != INI_NOT_FOUND) {
-        const char *variable_val = ini_property_value(ini, section, idx);
-        variables[i].var = variable_val;
-        retro->variables.push_back(variables[i]);
-      } else {
-        ini_property_add(ini, section, (char *)variables[i].name.c_str(),
-                         strlen(variables[i].name.c_str()),
-                         (char *)variables[i].var.c_str(),
-                         strlen(variables[i].var.c_str()));
-        retro->variables.push_back(variables[i]);
-        save = true;
-      }
+    //cache is ok, load from cache
+    for (int i = 0; i < vars_infile; i++) {
+      CLibretro::core_vars vars_struct;
+      std::string name=  ini_property_name(ini, section, i);
+      std::string value = ini_property_value(ini, section, i);
+      std::string description = name+ "_description_";
+      std::string usedvars = name+ "_usedvars_";
+      int idx_description =ini_find_property(ini, section, (char *)description.c_str(),description.length());
+      int idx_usedvars = ini_find_property(ini,section,(char*)usedvars.c_str(),usedvars.length());
+      const char* description_val = ini_property_value(ini, section, idx_description);
+      const char* usedvars_val = ini_property_value(ini, section, idx_usedvars);
+      vars_struct.name = name;
+      vars_struct.var = value;
+      vars_struct.description = description_val;
+      vars_struct.usevars = usedvars_val;
+      retro->variables.push_back(vars_struct);
     }
     if (save) {
       int size = ini_save(ini, NULL, 0); // Find the size needed
       char *data = (char *)malloc(size);
       size = ini_save(ini, data, size); // Actually save the file
-      fp = _wfopen(retro->core_config.c_str(), L"w");
-      fwrite(data, 1, size, fp);
-      fclose(fp);
+      Mud_FileAccess::save_data((unsigned char*)data, size, config_path);
       free(data);
     }
     ini_destroy(ini);
-    fclose(fp);
   }
 }
 

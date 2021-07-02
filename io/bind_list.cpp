@@ -110,7 +110,7 @@ public:
 		lock();
 			if ( e.type == dinput::di_event::ev_joy )
 			{
-				GUID guid;
+				unsigned long guid;
 				if ( guids->get_guid( e.joy.serial, guid ) )
 					guids->add( guid );
 			}
@@ -157,7 +157,7 @@ public:
 			assert( index < get_count() );
 
 			std::vector< bind >::iterator it = list.begin() + index;
-			GUID guid;
+			unsigned long guid;
 
 			if ( it->e.type == dinput::di_event::ev_joy )
 			{
@@ -173,7 +173,7 @@ public:
 	{
 		lock();
 			std::vector< bind >::iterator it;
-			GUID guid;
+			unsigned long guid;
 			for ( it = list.begin(); it < list.end(); ++it )
 			{
 				if ( it->e.type == dinput::di_event::ev_joy )
@@ -192,7 +192,7 @@ public:
 		std::vector< bind > list2;
 		list2 = list;
 		std::vector< bind >::iterator it;
-		GUID guid;
+		unsigned long guid;
 		for (it = list.begin(); it < list.end(); ++it)
 		{
 			if (it->e.type == dinput::di_event::ev_joy)
@@ -266,7 +266,7 @@ public:
 
 					else if ( b.e.type == dinput::di_event::ev_joy )
 					{
-						GUID guid;
+						unsigned long guid;
 						err = in.read( & guid, sizeof( guid ) ); if ( err ) break;
 						err = in.read( & b.e.joy.type, sizeof( b.e.joy.type ) ); if ( err ) break;
 						err = in.read( & b.e.joy.which, sizeof( b.e.joy.which ) ); if ( err ) break;
@@ -339,7 +339,7 @@ public:
 					}
 					else if ( it->e.type == dinput::di_event::ev_joy )
 					{
-						GUID guid;
+						unsigned long guid;
 						if ( ! guids->get_guid( it->e.joy.serial, guid ) ) { err = "GUID missing"; break; }
 						err = out.write( & guid, sizeof( guid ) ); if ( err ) break;
 						err = out.write( & it->e.joy.type, sizeof( it->e.joy.type ) ); if ( err ) break;

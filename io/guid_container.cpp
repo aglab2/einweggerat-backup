@@ -9,7 +9,7 @@ class guid_container_i : public guid_container
 	{
 		unsigned ref_count;
 		unsigned serial;
-		GUID     guid;
+		unsigned long vidpid;
 	};
 
 	std::vector< item > list;
@@ -20,12 +20,12 @@ public:
 	guid_container_i() : serial( 0 ) {}
 	virtual ~guid_container_i() {}
 
-	virtual unsigned add( const GUID & guid )
+	virtual unsigned add( const unsigned long & guid )
 	{
 		std::vector< item >::iterator it;
 		for ( it = list.begin(); it < list.end(); ++it )
 		{
-			if ( it->guid == guid )
+			if ( it->vidpid == guid )
 			{
 				++ it->ref_count;
 				return it->serial;
@@ -35,19 +35,19 @@ public:
 		item i;
 		i.ref_count = 1;
 		i.serial = serial++;
-		i.guid = guid;
+		i.vidpid = guid;
 
 		list.push_back( i );
 
 		return i.serial;
 	}
 
-	virtual void remove( const GUID & guid )
+	virtual void remove( const unsigned long & guid )
 	{
 		std::vector< item >::iterator it;
 		for ( it = list.begin(); it < list.end(); ++it )
 		{
-			if ( it->guid == guid )
+			if ( it->vidpid == guid )
 			{
 				if ( -- it->ref_count == 0 )
 				{
@@ -58,14 +58,14 @@ public:
 		}
 	}
 
-	virtual bool get_guid( unsigned serial, GUID & guid )
+	virtual bool get_guid( unsigned serial, unsigned long & guid )
 	{
 		std::vector< item >::iterator it;
 		for ( it = list.begin(); it < list.end(); ++it )
 		{
 			if ( it->serial == serial )
 			{
-				guid = it->guid;
+				guid = it->vidpid;
 				return true;
 			}
 		}
