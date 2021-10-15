@@ -2,6 +2,8 @@
 
 **Support/help/bug reports will be ignored.**
 
+**Development on this has ceased in favour of SDLggerat**
+
 ![einweggerät](https://i.ibb.co/ggtfb7v/SuYinpW.png)
 
 **If you want to play games, use something else for serious use. Use of this for general use is not recommended**
