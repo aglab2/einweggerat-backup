@@ -28,7 +28,7 @@ private:
 	bool core_load(TCHAR* sofile, bool specifics, TCHAR* filename);
 	void core_unload();
 public:
-	CLibretro();
+	CLibretro(HWND hwnd = NULL);
 	~CLibretro();
 	static CLibretro* GetInstance(HWND hwnd = NULL);
 

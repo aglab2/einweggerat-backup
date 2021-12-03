@@ -16,23 +16,21 @@ bool CLibretro::savestate(TCHAR *filename, bool save) {
   if (isEmulating) {
     size_t size = g_retro.retro_serialize_size();
     if (size) {
-      BYTE *Memory = (BYTE *)malloc(size);
+      auto Memory = std::make_unique<uint8_t[]>(size);
       if (save) {
         // Get the filesize
-        g_retro.retro_serialize(Memory, size);
-        Mud_FileAccess::save_data(Memory, size, filename);
+        g_retro.retro_serialize(Memory.get(), size);
+        Mud_FileAccess::save_data(Memory.get(), size, filename);
       } else {
         unsigned sz;
         BYTE *save_data = (BYTE *)Mud_FileAccess::load_data(filename, &sz);
         if (!save_data) {
-          free(Memory);
           return false;
         }
-        memcpy(Memory, save_data, size);
-        g_retro.retro_unserialize(Memory, size);
+        memcpy(Memory.get(), save_data, size);
+        g_retro.retro_unserialize(Memory.get(), size);
         free(save_data);
       }
-      free(Memory);
       return true;
     }
   }
@@ -116,12 +114,9 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
   game_filename_.erase(0, game_filename_.find_last_of(L"\\/") +1);
   //strip extension
   game_filename_.erase(game_filename_.rfind('.'));
-
-  einweg_dir = Mud_Misc::ExePath();
-  einweg_dir += L"\\system";
+  einweg_dir = Mud_Misc::ExePath() + L"\\system";
   sys_name = save_name = sram_name = einweg_dir;
-  sram_name += L"\\" + game_filename_;
-  sram_name += L".sram";
+  sram_name += L"\\" + game_filename_ + L".sram";
   core_config = sofile;
   core_config = core_config.erase(core_config.rfind('.'));
   if (gamespecificoptions)
@@ -141,18 +136,16 @@ static void noop() {}
 //////////////////////////////////////////////////////////////////////////////////////////
 CLibretro *CLibretro::m_Instance = 0;
 CLibretro *CLibretro::GetInstance(HWND hwnd) {
-  if (0 == m_Instance) {
-    m_Instance = new CLibretro();
-    m_Instance->init(hwnd);
-  }
+  static CLibretro* instance = new CLibretro(hwnd);
   return m_Instance;
 }
 
 bool CLibretro::running() { return isEmulating; }
 
-CLibretro::CLibretro() {
+CLibretro::CLibretro(HWND hwnd) {
   memset(&g_retro, 0, sizeof(g_retro));
   isEmulating = false;
+  if (hwnd)init(hwnd);
 }
 
 CLibretro::~CLibretro(void) {

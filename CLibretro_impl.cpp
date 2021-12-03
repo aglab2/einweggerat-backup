@@ -239,7 +239,6 @@ static size_t core_audio_sample_batch(const int16_t *data, size_t frames) {
 
 static void core_log(enum retro_log_level level, const char *fmt, ...) {
   char buffer[4096] = {0};
-  char buffer2[4096] = {0};
   static const char *levelstr[] = {"dbg", "inf", "wrn", "err"};
   va_list va;
   va_start(va, fmt);
@@ -247,8 +246,7 @@ static void core_log(enum retro_log_level level, const char *fmt, ...) {
   va_end(va);
   if (level == 0)
     return;
-  sprintf(buffer2, "[%s] %s", levelstr[level], buffer);
-  fprintf(stdout, "%s", buffer2);
+  fprintf(stdout, "[%s] %s", levelstr[level], buffer);
 }
 
 bool core_environment(unsigned cmd, void *data) {

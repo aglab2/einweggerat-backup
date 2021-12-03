@@ -175,40 +175,31 @@ public:
 
 	static unsigned get_filesize(const TCHAR *path)
 	{
-		FILE *input = _wfopen((wchar_t*)path, L"rb");
+		auto input = unique_ptr<FILE, int(*)(FILE*)>(_wfopen(path, L"rb"), &fclose);
 		if (!input)return NULL;
-		unsigned size = get_filesize(input);
-		fclose(input);
-		input = NULL;
+		unsigned size = get_filesize(input.get());
 		return size;
 	}
 
 	static bool save_data(unsigned char* data, unsigned size, TCHAR* path)
 	{
-		FILE *input = _wfopen((wchar_t*)path, L"wb");
+		auto input = unique_ptr<FILE, int(*)(FILE*)>(_wfopen(path, L"rb"), &fclose);
 		if (!input)return false;
-		fwrite(data, 1, size, input);
-		fclose(input);
-		input = NULL;
+		fwrite(data, 1, size, input.get());
 		return true;
 	}
 
 	static unsigned char* load_data(TCHAR* path, unsigned * size)
 	{
-		FILE *input = _wfopen((wchar_t*)path, L"rb");
+		auto input = unique_ptr<FILE, int(*)(FILE*)>(_wfopen(path, L"rb"), &fclose);
 		if (!input)return NULL;
-		unsigned Size = get_filesize(input);
+		unsigned Size = get_filesize(input.get());
 		if (!Size)
-		{
-			err:
-			fclose(input);
 			return NULL;
-		}
 		*size = Size;
 		BYTE *Memory = (BYTE *)malloc(Size);
-		if (!Memory) goto err;
-		int res = fread(Memory, 1, Size, input);
-		fclose(input);
+		if (!Memory) return NULL;
+		int res = fread(Memory, 1, Size, input.get());
 		if (!res)
 		{
 			free(Memory);
