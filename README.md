@@ -2,15 +2,11 @@
 
 **Support/help/bug reports will be ignored.**
 
-**Development on this has ceased in favour of SDLggerat**
-
 ![einweggerät](https://i.ibb.co/ggtfb7v/SuYinpW.png)
-
-**If you want to play games, use something else for serious use. Use of this for general use is not recommended**
 
 Requires Windows 7 and up. No exceptions.
 
-To compile using MSVC2019 (you need ATL/MFC installed with your MSVC install):
+To compile using MSVC2022 (you need ATL/MFC installed with your MSVC install):
 1) **Clone/fork the Github repo only. This is vital.**
 2) Use MSVC to make a release grade Win32/x64 build.
 
