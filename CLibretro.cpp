@@ -93,6 +93,7 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
   if (!(*(void **)(&V) = (void *)libload(#name)))                              \
   die()
 #define load_retro_sym(S) load_sym(g_retro.S, S)
+  
   load_retro_sym(retro_init);
   load_retro_sym(retro_deinit);
   load_retro_sym(retro_api_version);
@@ -108,6 +109,8 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
   load_retro_sym(retro_serialize_size);
   load_retro_sym(retro_get_memory_size);
   load_retro_sym(retro_get_memory_data);
+  ::load_envsymb(g_retro.handle);
+  g_retro.retro_init();
 
   game_filename_ = game_filename;
   //strip path
@@ -125,8 +128,7 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
       core_config += L".ini";
 
   // set libretro func pointers
-  load_envsymb(g_retro.handle);
-  g_retro.retro_init();
+  
   g_retro.initialized = true;
   return true;
 }
@@ -134,10 +136,9 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
 static void noop() {}
 
 //////////////////////////////////////////////////////////////////////////////////////////
-CLibretro *CLibretro::m_Instance = 0;
 CLibretro *CLibretro::GetInstance(HWND hwnd) {
   static CLibretro* instance = new CLibretro(hwnd);
-  return m_Instance;
+  return instance;
 }
 
 bool CLibretro::running() { return isEmulating; }
@@ -209,9 +210,7 @@ bool CLibretro::loadfile(TCHAR *filename, TCHAR *core_filename,
     fclose(inputfile);
     inputfile = NULL;
   }
-  struct retro_system_info system_info = {0};
-  g_retro.retro_get_system_info(&system_info);
-  core_name = Mud_String::utf8toutf16(system_info.library_name);
+  core_name = Mud_String::utf8toutf16(system.library_name);
   if (!g_retro.retro_load_game(&info)) {
     printf("FAILED TO LOAD ROM!!!!!!!!!!!!!!!!!!");
     return false;
@@ -238,9 +237,8 @@ void CLibretro::run() {
   static int nbFrames = 0;
   if (!g_video.software_rast) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
-
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   g_retro.retro_run();
 
   double currentTime = (double)mudtime.milliseconds_now() / 1000;

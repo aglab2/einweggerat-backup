@@ -19,7 +19,6 @@ namespace std
 class CLibretro
 {
 private:	
-	static	CLibretro* m_Instance;
 	Mud_Timing mudtime;
 	double lastTime;
 	struct retro_game_info info;

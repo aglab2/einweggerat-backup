@@ -317,7 +317,7 @@ void video_init(const struct retro_game_geometry* geom, HWND hwnd) {
 	g_video.tex_id = 0;
 
 	if (!g_video.pixfmt)
-		g_video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
+		video_set_pixel_format(RETRO_PIXEL_FORMAT_0RGB1555);
 
 	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -325,7 +325,7 @@ void video_init(const struct retro_game_geometry* geom, HWND hwnd) {
 
 	glGenTextures(1, &g_video.tex_id);
 
-	g_video.pitch = geom->base_width * g_video.bpp;
+	g_video.pitch = geom->max_width * g_video.bpp;
 
 	glBindTexture(GL_TEXTURE_2D, g_video.tex_id);
 
@@ -379,6 +379,9 @@ bool video_set_pixel_format(unsigned format) {
 		g_video.bpp = sizeof(uint16_t);
 		break;
 	default:
+		g_video.pixfmt = GL_UNSIGNED_SHORT_5_5_5_1;
+		g_video.pixtype = GL_BGRA;
+		g_video.bpp = sizeof(uint16_t);
 		break;
 	}
 
@@ -399,8 +402,10 @@ void video_refresh(const void* data, unsigned width, unsigned height,
 	resize_cb();
 	glBindTexture(GL_TEXTURE_2D, g_video.tex_id);
 
-	if (data && data != RETRO_HW_FRAME_BUFFER_VALID) {
+	if (pitch != g_video.pitch) 
 		g_video.pitch = pitch;
+
+	if (data && data != RETRO_HW_FRAME_BUFFER_VALID) {
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, g_video.pitch / g_video.bpp);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, g_video.pixtype,
 			g_video.pixfmt, data);

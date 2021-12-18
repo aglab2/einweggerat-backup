@@ -6,14 +6,10 @@ static const GUID g_signature = {
     0x40b3,
     {0x9a, 0xe9, 0xbf, 0x82, 0x85, 0x86, 0x4b, 0xb5}};
 
-input *input::m_Instance = 0;
+
 input *input::GetInstance(HINSTANCE hInstance, HWND hWnd) {
-  if (0 == m_Instance) {
-    m_Instance = new input();
-    m_Instance->open(hInstance, hWnd);
-    m_Instance->hwnd = hWnd;
-  }
-  return m_Instance;
+    static input* instance = new input(hInstance,hWnd);
+    return instance;
 }
 
 TCHAR *input::getdescription(int which) { return bl->getdescription(which); }
@@ -49,14 +45,17 @@ void input::close() {
   }
 }
 
-input::input() {
+input::input(HINSTANCE hInstance, HWND hWnd) {
   list_count = 0;
   bits = 0;
   lpDI = 0;
   guids = 0;
   di = 0;
   bl = 0;
-  hwnd = NULL;
+  if (hwnd)
+  {
+    open(hInstance, hWnd);
+  }
 }
 
 input::~input() { close(); }

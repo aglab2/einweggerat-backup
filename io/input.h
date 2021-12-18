@@ -22,7 +22,7 @@ class input
   //HWND                    hWnd;
 public:
   int list_count;
-  input();
+  input(HINSTANCE hInstance = NULL,HWND hwnd = NULL);
   ~input();
   unsigned                bits;
   LPDIRECTINPUT8          lpDI;
@@ -31,7 +31,6 @@ public:
   dinput                * di;
   bind_list             * bl;
   HWND hwnd;
-  static	input* m_Instance;
   static input* GetInstance(HINSTANCE hInstance = NULL, HWND hWnd=NULL);
 
 

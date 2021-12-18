@@ -249,7 +249,7 @@ static void core_log(enum retro_log_level level, const char *fmt, ...) {
   fprintf(stdout, "[%s] %s", levelstr[level], buffer);
 }
 
-bool core_environment(unsigned cmd, void *data) {
+static bool core_environment(unsigned cmd, void *data) {
   bool *bval;
   CLibretro *retro = CLibretro::GetInstance();
   input *input_device = input::GetInstance();
@@ -401,10 +401,17 @@ bool core_environment(unsigned cmd, void *data) {
     return true;
   } break;
 
-  case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
-    const enum retro_pixel_format *fmt = (enum retro_pixel_format *)data;
-    if (*fmt > RETRO_PIXEL_FORMAT_RGB565)
+  case RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO: {
       return false;
+      break;
+  }
+
+  case RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION: {
+      return false;
+  }
+
+  case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
+    const enum retro_pixel_format *fmt = (const enum retro_pixel_format *)data;
     return video_set_pixel_format(*fmt);
   }
   case RETRO_ENVIRONMENT_SET_HW_RENDER: {
@@ -426,6 +433,8 @@ bool core_environment(unsigned cmd, void *data) {
 
 static void core_video_refresh(const void *data, unsigned width,
                                unsigned height, size_t pitch) {
+    CLibretro* retro = CLibretro::GetInstance();
+    if (retro->isEmulating)
   video_refresh(data, width, height, pitch);
 }
 
