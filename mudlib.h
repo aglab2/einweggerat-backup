@@ -19,10 +19,10 @@ public:
 	{
 		
 		DWORD out_sz =0;
-		if (CryptBinaryToString(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &out_sz)) {
-			if (!out_sz) return NULL;
+		if (CryptBinaryToStringW(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &out_sz)) {
+			if (!out_sz) return {};
 			std::wstring out(out_sz, 0);
-			if (CryptBinaryToString(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, (TCHAR*)out.c_str(), &out_sz))
+			if (CryptBinaryToStringW(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, &out[0], &out_sz))
 			{
 				*outlen = out_sz;
 				return out;
@@ -44,10 +44,10 @@ public:
 	static std::vector<BYTE> decode(std::wstring string, int inlen, unsigned int * outlen)
 	{
 		DWORD out_sz = 0;
-		if (CryptStringToBinary(string.c_str(), inlen, CRYPT_STRING_BASE64, NULL, &out_sz, NULL, NULL))
+		if (CryptStringToBinaryW(string.c_str(), inlen, CRYPT_STRING_BASE64, NULL, &out_sz, NULL, NULL))
 		{
 			std::vector<BYTE> result(out_sz,0);
-			CryptStringToBinary(string.c_str(), inlen, CRYPT_STRING_BASE64, (BYTE*)result.data(), &out_sz, NULL, NULL);
+			CryptStringToBinaryW(string.c_str(), inlen, CRYPT_STRING_BASE64, (BYTE*)result.data(), &out_sz, NULL, NULL);
 			*outlen = out_sz;
 			return result;
 		}
