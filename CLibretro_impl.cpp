@@ -9,30 +9,28 @@
 #define INLINE
 using namespace std;
 
-unsigned char *load_inputsettings(TCHAR *path, unsigned *size) {
+std::vector<BYTE> load_inputsettings(TCHAR *path, unsigned *size) {
   unsigned size_ = Mud_FileAccess::get_filesize(path);
  
   if (size_) {
-    unsigned char* data1 = Mud_FileAccess::load_data(path, &size_);
-    ini_t *ini = ini_load((char*)data1, NULL);
-    free(data1);
+    std::vector<BYTE> data1 = Mud_FileAccess::load_data(path, &size_);
+    ini_t *ini = ini_load((char*)data1.data(), NULL);
     int section = ini_find_section(ini, "Input Settings", strlen("Input Settings"));
     if (section == INI_NOT_FOUND) {
       ini_destroy(ini);
-      return NULL;
+      return {};
     } else {
       int index = ini_find_property(ini, section, "Data", strlen("Data"));
       char const *text = ini_property_value(ini, section, index);
       tstring ansi = Mud_String::utf8toutf16(text);
       unsigned len = 0;
-      unsigned char *data2 =
-          Mud_Base64::decode(ansi.c_str(), ansi.length(), &len);
+      std::vector<BYTE> data2=Mud_Base64::decode(ansi.c_str(), ansi.length(), &len);
       *size = len;
       ini_destroy(ini);
       return data2;
     }
   }
-  return NULL;
+  return {};
 }
 
 const char *load_coresettings(retro_variable *var, CLibretro *retro) {
@@ -50,11 +48,11 @@ void save_inputsettings(unsigned char *data_ptr, unsigned data_sz,
   unsigned size_ = Mud_FileAccess::get_filesize(config_path);
   if (size_)
   {
-    char* data = (char*)Mud_FileAccess::load_data(config_path, &size_);
-    ini = ini_load((char*)data, NULL);
+    std::vector<BYTE> data = Mud_FileAccess::load_data(config_path, &size_);
+    ini = ini_load((char*)data.data(), NULL);
     int section = ini_find_section(ini, "Input Settings", strlen("Input Settings"));
     unsigned outbaselen = 0;
-    TCHAR *data2 = Mud_Base64::encode(data_ptr, data_sz, &outbaselen);
+    std::wstring data2 = Mud_Base64::encode(data_ptr, data_sz, &outbaselen);
     string ansi = Mud_String::utf16toutf8(data2);
     if (section != INI_NOT_FOUND) {
       int idx = ini_find_property(ini, section, "Data", strlen("Data"));
@@ -65,16 +63,12 @@ void save_inputsettings(unsigned char *data_ptr, unsigned data_sz,
       ini_property_add(ini, section, "Data", strlen("Data"), ansi.c_str(),
                        outbaselen);
     }
-    free(data2);
-    free(data);
 
     size_ = ini_save(ini, NULL, 0); // Find the size needed
-    data = (char *)malloc(size_);
-    size_ = ini_save(ini, data, size_); // Actually save the file
-    Mud_FileAccess::save_data((unsigned char*)data, size_, config_path);
+    auto ini_data = std::make_unique<char[]>(size_);
+    size_ = ini_save(ini, ini_data.get(), size_); // Actually save the file
+    Mud_FileAccess::save_data((unsigned char*)ini_data.get(), size_, config_path);
     ini_destroy(ini);
-    if (data)
-        free(data);
   }
   
 }
@@ -85,8 +79,8 @@ void save_coresettings(CLibretro *retro) {
   unsigned size_ = Mud_FileAccess::get_filesize((TCHAR*)retro->core_config.c_str());
   TCHAR* config_path = (TCHAR*)retro->core_config.c_str();
   if (size_) {
-    char* data = (char*)Mud_FileAccess::load_data(config_path, &size_);
-    ini = ini_load(data, NULL);
+    std::vector<BYTE> data = Mud_FileAccess::load_data(config_path, &size_);
+    ini = ini_load((char*)data.data(), NULL);
     int section = ini_find_section(ini, "Core Settings", strlen("Core Settings"));
     for (int i = 0; i < retro->variables.size(); i++) {
 
@@ -96,16 +90,13 @@ void save_coresettings(CLibretro *retro) {
       ini_property_value_set(ini, section, idx, retro->variables[i].var.c_str(),
                              retro->variables[i].var.length());
     }
-    free(data);
 
 
     size_ = ini_save(ini, NULL, 0); // Find the size needed
-    data = (char *)malloc(size_);
-    memset(data, 0, size_);
-    size_ = ini_save(ini, data, size_); // Actually save the file
-    Mud_FileAccess::save_data((unsigned char*)data, size_, config_path);
+    auto ini_data = std::make_unique<char[]>(size_);
+    size_ = ini_save(ini, ini_data.get(), size_); // Actually save the file
+    Mud_FileAccess::save_data((unsigned char*)ini_data.get(), size_, config_path);
     ini_destroy(ini);
-    free(data);
   }
   
 }
@@ -171,16 +162,14 @@ void init_coresettings(retro_variable *var, CLibretro *retro) {
     ini_property_add(ini, section, "usedvars_num", strlen("usedvars_num"), lengthstr, strlen(lengthstr));
 
     int size = ini_save(ini, NULL, 0); // Find the size needed
-    char *data = (char *)malloc(size);
-    size = ini_save(ini, data, size); // Actually save the file
+    auto ini_data = std::make_unique<char[]>(size);
+    size = ini_save(ini, ini_data.get(), size); // Actually save the file
     ini_destroy(ini);
-    Mud_FileAccess::save_data((unsigned char*)data, size, config_path);
-    free(data);
+    Mud_FileAccess::save_data((unsigned char*)ini_data.get(), size, config_path);
   } else {
     //load
-     char* data = (char*)Mud_FileAccess::load_data(config_path, (unsigned int*)&size_);
-    ini_t *ini = ini_load(data, NULL);
-    free(data);
+    std::vector<BYTE> data = Mud_FileAccess::load_data(config_path, (unsigned int*)&size_);
+    ini_t *ini = ini_load((char*)data.data(), NULL);
 
 
     int section = ini_find_section(ini, "Core Settings", strlen("Core Settings"));
@@ -213,10 +202,9 @@ void init_coresettings(retro_variable *var, CLibretro *retro) {
     }
     if (save) {
       int size = ini_save(ini, NULL, 0); // Find the size needed
-      char *data = (char *)malloc(size);
-      size = ini_save(ini, data, size); // Actually save the file
-      Mud_FileAccess::save_data((unsigned char*)data, size, config_path);
-      free(data);
+      auto ini_data = std::make_unique<char[]>(size);
+      size = ini_save(ini, ini_data.get(), size); // Actually save the file
+      Mud_FileAccess::save_data((unsigned char*)ini_data.get(), size, config_path);
     }
     ini_destroy(ini);
   }
@@ -347,9 +335,9 @@ static bool core_environment(unsigned cmd, void *data) {
       }
 
     unsigned sz = 0;
-    unsigned char *config = load_inputsettings((TCHAR*)retro->core_config.c_str(), &sz);
-    if (config) {
-      Mem_File_Reader out(config, sz);
+    std::vector<BYTE> config = load_inputsettings((TCHAR*)retro->core_config.c_str(), &sz);
+    if (!config.empty()) {
+      Mem_File_Reader out((BYTE*)config.data(), sz);
       const char *err = input_device->load(out);
       if (!err) {
         int i = 0;
@@ -360,7 +348,7 @@ static bool core_environment(unsigned cmd, void *data) {
           i++;
         }
       }
-      free(config);
+
     } else {
     init:
       input_device->bl->clear();

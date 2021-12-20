@@ -23,13 +23,9 @@ bool CLibretro::savestate(TCHAR *filename, bool save) {
         Mud_FileAccess::save_data(Memory.get(), size, filename);
       } else {
         unsigned sz;
-        BYTE *save_data = (BYTE *)Mud_FileAccess::load_data(filename, &sz);
-        if (!save_data) {
-          return false;
-        }
-        memcpy(Memory.get(), save_data, size);
+        std::vector<BYTE> save_data = Mud_FileAccess::load_data(filename, &sz);
+        memcpy(Memory.get(), (BYTE*)save_data.data(), size);
         g_retro.retro_unserialize(Memory.get(), size);
-        free(save_data);
       }
       return true;
     }
@@ -46,11 +42,8 @@ bool CLibretro::savesram(TCHAR *filename, bool save) {
         return Mud_FileAccess::save_data(Memory, size, filename);
       else {
         unsigned sz;
-        BYTE *save_data = (BYTE *)Mud_FileAccess::load_data(filename, &sz);
-        if (!save_data)
-          return false;
-        memcpy(Memory, save_data, size);
-        free(save_data);
+        std::vector<BYTE> save_data = Mud_FileAccess::load_data(filename, &sz);
+        memcpy(Memory, (BYTE*)save_data.data(), size);
         return true;
       }
     }
@@ -109,8 +102,7 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
   load_retro_sym(retro_serialize_size);
   load_retro_sym(retro_get_memory_size);
   load_retro_sym(retro_get_memory_data);
-  ::load_envsymb(g_retro.handle);
-  g_retro.retro_init();
+  
 
   game_filename_ = game_filename;
   //strip path
@@ -128,7 +120,8 @@ bool CLibretro::core_load(TCHAR *sofile, bool gamespecificoptions,
       core_config += L".ini";
 
   // set libretro func pointers
-  
+  ::load_envsymb(g_retro.handle);
+  g_retro.retro_init();
   g_retro.initialized = true;
   return true;
 }

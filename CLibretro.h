@@ -86,7 +86,7 @@ extern "C" {
 #endif
 	void load_envsymb(HMODULE handle);
 	void save_coresettings(CLibretro *retro);
-	unsigned char* load_inputsettings(TCHAR* path, unsigned* size);
+	std::vector<BYTE> load_inputsettings(TCHAR* path, unsigned* size);
 	void save_inputsettings(unsigned char* data_ptr, unsigned data_sz, CLibretro* retro);
 #ifdef __cplusplus
 }

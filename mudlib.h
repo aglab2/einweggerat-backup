@@ -15,43 +15,44 @@ using namespace std;
 class Mud_Base64
 {
 public:
-	static TCHAR* encode(const BYTE* buf, unsigned int buflen, unsigned * outlen)
+	static std::wstring encode(const BYTE* buf, unsigned int buflen, unsigned * outlen)
 	{
+		
 		DWORD out_sz =0;
 		if (CryptBinaryToString(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &out_sz)) {
 			if (!out_sz) return NULL;
-			TCHAR* out = (TCHAR*)malloc(out_sz * sizeof(TCHAR));
-			if (!out)return NULL;
-			memset(out, 0, out_sz * sizeof(TCHAR));
-			if (CryptBinaryToString(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, out, &out_sz))
+			std::wstring out(out_sz, 0);
+			if (CryptBinaryToString(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, (TCHAR*)out.c_str(), &out_sz))
 			{
 				*outlen = out_sz;
 				return out;
 			}
 			else
-				return NULL;
+			{
+				*outlen = 0;
+				return {};
+			}
+				
 		}
 		else
-			return NULL;
+		{
+			*outlen = 0;
+			return {};
+		}
 
 	}
-	static BYTE* decode(const TCHAR * string, int inlen, unsigned int * outlen)
+	static std::vector<BYTE> decode(std::wstring string, int inlen, unsigned int * outlen)
 	{
-		BYTE *result = NULL;
 		DWORD out_sz = 0;
-		if (CryptStringToBinary(string, inlen, CRYPT_STRING_BASE64, NULL, &out_sz, NULL, NULL))
+		if (CryptStringToBinary(string.c_str(), inlen, CRYPT_STRING_BASE64, NULL, &out_sz, NULL, NULL))
 		{
-			result = (BYTE*)malloc((out_sz) * sizeof(BYTE));
-			if (!result)return NULL;
-			ZeroMemory(result, (out_sz) * sizeof(BYTE));
-			CryptStringToBinary(string, inlen, CRYPT_STRING_BASE64, (BYTE*)result, &out_sz, NULL, NULL);
+			std::vector<BYTE> result(out_sz,0);
+			CryptStringToBinary(string.c_str(), inlen, CRYPT_STRING_BASE64, (BYTE*)result.data(), &out_sz, NULL, NULL);
+			*outlen = out_sz;
+			return result;
 		}
 		else
-		{
-			return NULL;
-		}
-		*outlen = out_sz;
-		return result;
+			return {};
 	}
 };
 
@@ -183,28 +184,19 @@ public:
 
 	static bool save_data(unsigned char* data, unsigned size, TCHAR* path)
 	{
-		auto input = unique_ptr<FILE, int(*)(FILE*)>(_wfopen(path, L"rb"), &fclose);
+		auto input = unique_ptr<FILE, int(*)(FILE*)>(_wfopen(path, L"wb"), &fclose);
 		if (!input)return false;
 		fwrite(data, 1, size, input.get());
 		return true;
 	}
 
-	static unsigned char* load_data(TCHAR* path, unsigned * size)
+	static std::vector<BYTE> load_data(TCHAR* path, unsigned * size)
 	{
 		auto input = unique_ptr<FILE, int(*)(FILE*)>(_wfopen(path, L"rb"), &fclose);
-		if (!input)return NULL;
 		unsigned Size = get_filesize(input.get());
-		if (!Size)
-			return NULL;
 		*size = Size;
-		BYTE *Memory = (BYTE *)malloc(Size);
-		if (!Memory) return NULL;
-		int res = fread(Memory, 1, Size, input.get());
-		if (!res)
-		{
-			free(Memory);
-			return NULL;
-		}
+		std::vector<BYTE> Memory(Size,0);
+		int res = fread((BYTE*)Memory.data(), 1, Size, input.get());
 		return Memory;
 	}
 };
