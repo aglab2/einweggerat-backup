@@ -24,6 +24,7 @@ bool CLibretro::savestate(TCHAR *filename, bool save) {
       } else {
         unsigned sz;
         std::vector<BYTE> save_data = Mud_FileAccess::load_data(filename, &sz);
+        if (save_data.empty())return false;
         memcpy(Memory.get(), (BYTE*)save_data.data(), size);
         g_retro.retro_unserialize(Memory.get(), size);
       }
