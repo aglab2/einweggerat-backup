@@ -358,8 +358,8 @@ static bool core_environment(unsigned cmd, void *data) {
         keyboard.type = dinput::di_event::ev_none;
         keyboard.key.type = dinput::di_event::key_none;
         keyboard.key.which = NULL;
-        CString str = bind_ra[i].description;
-        input_device->bl->add(keyboard, i, str.GetBuffer(NULL), bind_ra[i].retroid);
+        wstring str = Mud_String::ansitoutf16(bind_ra[i].description);
+        input_device->bl->add(keyboard, i, (TCHAR*)str.c_str(), bind_ra[i].retroid);
         i++;
       }
       Mem_Writer out2;

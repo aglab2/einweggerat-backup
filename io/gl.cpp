@@ -7,32 +7,10 @@
 video g_video;
 
 static const PIXELFORMATDESCRIPTOR pfd = {
-	sizeof(PIXELFORMATDESCRIPTOR),
-	1,
+	sizeof(PIXELFORMATDESCRIPTOR),1,
 	PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-	PFD_TYPE_RGBA,
-	32,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	32, // zbuffer
-	0,  // stencil!
-	0,
-	PFD_MAIN_PLANE,
-	0,
-	0,
-	0,
-	0 };
+	PFD_TYPE_RGBA,32,0,0,0,0,0,0,0,0,0,0,0,0,0,32,0,0,PFD_MAIN_PLANE,
+	0,0,0,0 };
 
 static struct {
 	GLuint vao;
@@ -49,23 +27,24 @@ static struct {
 static float g_scale = 2;
 static bool g_win = false;
 
-static const char* g_vshader_src =
-"#version 330\n"
-"in vec2 i_pos;\n"
-"in vec2 i_coord;\n"
-"out vec2 o_coord;\n"
-"uniform mat4 u_mvp;\n"
-"void main() {\n"
-"o_coord = i_coord;\n"
-"gl_Position = vec4(i_pos, 0.0, 1.0) * u_mvp;\n"
-"}";
+static const char* g_vshader_src =R"(
+#version 330
+in vec2 i_pos;
+in vec2 i_coord;
+out vec2 o_coord;
+uniform mat4 u_mvp;
+void main() {
+o_coord = i_coord;
+gl_Position = vec4(i_pos, 0.0, 1.0) * u_mvp;
+})";
 
-static const char* g_fshader_src = "#version 330\n"
-"in vec2 o_coord;\n"
-"uniform sampler2D u_tex;\n"
-"void main() {\n"
-"gl_FragColor = texture2D(u_tex, o_coord);\n"
-"}";
+static const char* g_fshader_src =R"(
+#version 330
+in vec2 o_coord;
+uniform sampler2D u_tex;
+void main() {
+gl_FragColor = texture2D(u_tex, o_coord);
+})";
 
 uintptr_t core_get_current_framebuffer() { return g_video.fbo_id; }
 
@@ -83,7 +62,7 @@ GLuint compile_shader(unsigned type, unsigned count, const char** strings) {
 	GLuint shader = glCreateShaderProgramv(type, 1, strings);
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 	if (status == GL_FALSE) {
-		char buffer[4096];
+		char buffer[4096]={0};
 		glGetShaderInfoLog(shader, sizeof(buffer), NULL, buffer);
 	}
 	return shader;
@@ -402,10 +381,11 @@ void video_refresh(const void* data, unsigned width, unsigned height,
 	resize_cb();
 	glBindTexture(GL_TEXTURE_2D, g_video.tex_id);
 
-	if (pitch != g_video.pitch) 
-		g_video.pitch = pitch;
+	
 
 	if (data && data != RETRO_HW_FRAME_BUFFER_VALID) {
+		if (pitch != g_video.pitch)
+			g_video.pitch = pitch;
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, g_video.pitch / g_video.bpp);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, g_video.pixtype,
 			g_video.pixfmt, data);

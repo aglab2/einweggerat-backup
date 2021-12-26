@@ -127,16 +127,12 @@ bool audio_init(double refreshra, float input_srate, float fps) {
     size_t outsamples_max = (FRAME_COUNT * 4 * sizeof(float));
     size_t sampsize = (FRAME_COUNT * (2 * sizeof(float)));
     audio_ctx_s._fifo = fifo_new(sampsize); // number of bytes
-    audio_ctx_s.output_float =
+    audio_ctx_s.output_float = 
         new float[outsamples_max]; // spare space for resampler
     audio_ctx_s.input_float = new float[outsamples_max];
 
-    uint8_t* tmp = (uint8_t*)calloc(1, sampsize);
-    if (tmp) {
-        fifo_write(audio_ctx_s._fifo, tmp, sampsize);
-        free(tmp);
-    }
-
+    auto tmp = std::make_unique<float[]>(sampsize);
+    fifo_write(audio_ctx_s._fifo, tmp.get(), sampsize);
     saudio_setup(audio_ctx_s.shit);
     return true;
 }

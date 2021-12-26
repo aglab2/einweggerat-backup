@@ -43,6 +43,7 @@ bool CLibretro::savesram(TCHAR *filename, bool save) {
       else {
         unsigned sz;
         std::vector<BYTE> save_data = Mud_FileAccess::load_data(filename, &sz);
+        if (save_data.empty())return false;
         memcpy(Memory, (BYTE*)save_data.data(), size);
         return true;
       }

@@ -22,23 +22,17 @@ public:
 		if (CryptBinaryToStringW(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &out_sz)) {
 			if (!out_sz) return {};
 			std::wstring out(out_sz, 0);
-			if (CryptBinaryToStringW(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, &out[0], &out_sz))
-			{
-				*outlen = out_sz;
-				return out;
-			}
-			else
+			if (!CryptBinaryToStringW(buf, buflen, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, &out[0], &out_sz))
 			{
 				*outlen = 0;
 				return {};
 			}
-				
+			*outlen = out_sz;
+			return out;	
 		}
-		else
-		{
-			*outlen = 0;
-			return {};
-		}
+		*outlen = 0;
+		return {};
+	
 
 	}
 	static std::vector<BYTE> decode(std::wstring string, int inlen, unsigned int * outlen)
@@ -193,6 +187,7 @@ public:
 	static std::vector<BYTE> load_data(TCHAR* path, unsigned * size)
 	{
 		auto input = unique_ptr<FILE, int(*)(FILE*)>(_wfopen(path, L"rb"), &fclose);
+		if (!input)return {};
 		unsigned Size = get_filesize(input.get());
 		*size = Size;
 		std::vector<BYTE> Memory(Size,0);
